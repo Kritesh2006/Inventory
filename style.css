@@ -238,9 +238,15 @@ body {
 .pill-np  { border-color: var(--green-border); background: var(--green-light); }
 .pill-np  .price-pill-label { color: var(--green-dark); }
 .pill-np  .price-pill-value { color: var(--green-dark); }
-.pill-min { border-color: var(--status-green-bd); background: #f0fdf4; }
-.pill-min .price-pill-label { color: var(--status-green); }
-.pill-min .price-pill-value { color: var(--status-green); }
+.pill-min {
+  border-color: #15803d;
+  background: #15803d;
+  box-shadow: 0 2px 8px rgba(21,128,61,.35);
+  transform: scale(1.08);
+  position: relative;
+}
+.pill-min .price-pill-label { color: rgba(255,255,255,.85); }
+.pill-min .price-pill-value { color: #ffffff; font-size: 20px; }
 .pill-max { border-color: var(--teal-bd); background: var(--teal-bg); }
 .pill-max .price-pill-label { color: var(--teal); }
 .pill-max .price-pill-value { color: var(--teal); }
