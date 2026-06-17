@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>.  — Price Lookup</title>
+  <title>Repair Price Lookup — Internal Tool</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,8 +16,8 @@
       <div class="logo">
         <span class="logo-icon">🔧</span>
         <div>
-          <span class="logo-name">. Repair</span>
-          <span class="logo-sub">Internal Price Lookup</span>
+          <span class="logo-name">Repair Price Lookup</span>
+          <span class="logo-sub">Internal Staff Tool</span>
         </div>
       </div>
       <nav class="header-nav">
@@ -52,6 +52,8 @@
           <button class="filter-btn" data-cat="Charging Port">Charging Port</button>
           <button class="filter-btn" data-cat="Camera">Camera</button>
           <button class="filter-btn" data-cat="Other">Other Repairs</button>
+          <!-- Dynamic category filters injected here by JS -->
+          <span id="dynamicFilters"></span>
         </div>
       </div>
     </section>
@@ -94,6 +96,7 @@
             ⬆ Import Backup
             <input type="file" accept=".json" id="importFile" onchange="importData(event)" style="display:none" />
           </label>
+          <button class="btn-add-cat" onclick="openAddCategoryModal()">＋ Add Category</button>
         </div>
       </div>
 
@@ -121,6 +124,7 @@
             <select id="fRepairType" onchange="handleRepairTypeChange()">
               <option value="">Select type…</option>
               <option value="LCD">LCD / Screen</option>
+              <option value="Digitizer">Digitizer (Touch Only)</option>
               <option value="Battery">Battery</option>
               <option value="Charging Port">Charging Port</option>
               <option value="Camera">Camera</option>
@@ -129,7 +133,7 @@
               <option value="Other">Other</option>
             </select>
           </div>
-          <div class="form-group" id="npGroup">
+          <div class="form-group" id="npGroup" style="display:none">
             <label>Non-Profit Price ($) <span class="label-tag">LCD only</span></label>
             <input type="number" id="fNonProfit" placeholder="e.g. 140" min="0" />
           </div>
@@ -153,7 +157,7 @@
         <p class="form-error" id="formError"></p>
       </div>
 
-      <!-- SEARCH ADMIN LIST -->
+      <!-- ADMIN LIST -->
       <div class="admin-list-header">
         <h3 class="form-title" style="margin:0">📋 All Repairs (<span id="adminCount">0</span>)</h3>
         <input type="text" id="adminSearch" class="admin-search-input" placeholder="Filter list…" oninput="renderAdminList()" />
@@ -163,8 +167,22 @@
     </div>
   </div>
 
+  <!-- ADD CATEGORY MODAL -->
+  <div class="modal-overlay" id="catModal" onclick="closeCatModalOutside(event)">
+    <div class="modal-box">
+      <div class="modal-title">➕ Add New Category</div>
+      <div class="modal-sub">Create a new brand or repair group. It will appear as a filter and a Brand option in the form — no code changes needed.</div>
+      <input type="text" class="modal-input" id="catName" placeholder="e.g. iWatch, MacBook, Google Pixel Parts…" />
+      <p class="modal-error" id="catError"></p>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeCatModal()">Cancel</button>
+        <button class="modal-confirm" onclick="saveCategory()">Add Category</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="site-footer">
-    . Repair · Internal Use Only · Prices subject to change
+    Repair Price Lookup · Internal Use Only · Prices subject to change
   </footer>
 
   <script src="script.js"></script>
