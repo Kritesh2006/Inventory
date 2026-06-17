@@ -1,1371 +1,670 @@
-/* ================================================================
-   ARIA v3 — script.js
-   Complete working logic for all features
-   ================================================================ */
+/* =============================================
+   TECHY REPAIR — PRICE LOOKUP
+   script.js  |  All logic, data, admin, storage
+   ============================================= */
 
-'use strict';
+// -----------------------------------------------
+// DEFAULT DATA  (all prices from the Google Sheet)
+// -----------------------------------------------
+const DEFAULT_DATA = [
 
-// ================================================================
-// CONFIG — change these to customise ARIA
-// ================================================================
-const CONFIG = {
-  // ── Access ──────────────────────────────────────────────
-  DEFAULT_PIN: '1234',          // Change via Settings modal
-  STAY_LOGGED_IN_DEFAULT: true, // Session survives page refresh
+  // ---- iPHONE LCD ----
+  { id:'d1',  brand:'iPhone', model:'iPhone 6',           repairType:'LCD', nonProfit:50,  minimum:60,  maximum:75,  keywords:['iphone 6','6 lcd'] },
+  { id:'d2',  brand:'iPhone', model:'iPhone 6 Plus',      repairType:'LCD', nonProfit:55,  minimum:60,  maximum:75,  keywords:['6 plus','6+','6plus'] },
+  { id:'d3',  brand:'iPhone', model:'iPhone 6S',          repairType:'LCD', nonProfit:50,  minimum:70,  maximum:80,  keywords:['6s'] },
+  { id:'d4',  brand:'iPhone', model:'iPhone 6S Plus',     repairType:'LCD', nonProfit:55,  minimum:65,  maximum:80,  keywords:['6s plus','6s+','6splus'] },
+  { id:'d5',  brand:'iPhone', model:'iPhone 7',           repairType:'LCD', nonProfit:60,  minimum:65,  maximum:80,  keywords:['7 lcd','iphone7'] },
+  { id:'d6',  brand:'iPhone', model:'iPhone 7 Plus',      repairType:'LCD', nonProfit:60,  minimum:70,  maximum:80,  keywords:['7 plus','7+','7plus'] },
+  { id:'d7',  brand:'iPhone', model:'iPhone 8',           repairType:'LCD', nonProfit:65,  minimum:75,  maximum:90,  keywords:['8 lcd','iphone8'] },
+  { id:'d8',  brand:'iPhone', model:'iPhone 8 Plus',      repairType:'LCD', nonProfit:65,  minimum:75,  maximum:90,  keywords:['8 plus','8+','8plus'] },
+  { id:'d9',  brand:'iPhone', model:'iPhone SE (1st/2nd Gen)', repairType:'LCD', nonProfit:65, minimum:75, maximum:90, keywords:['se','se2','se 2nd','se1','se 1st','iphone se'] },
+  { id:'d10', brand:'iPhone', model:'iPhone X',           repairType:'LCD', nonProfit:80,  minimum:90,  maximum:120, keywords:['x lcd','iphone x'] },
+  { id:'d11', brand:'iPhone', model:'iPhone XS',          repairType:'LCD', nonProfit:80,  minimum:90,  maximum:120, keywords:['xs','iphone xs'] },
+  { id:'d12', brand:'iPhone', model:'iPhone XS Max',      repairType:'LCD', nonProfit:80,  minimum:100, maximum:140, keywords:['xs max','xsmax','xs m'] },
+  { id:'d13', brand:'iPhone', model:'iPhone XR',          repairType:'LCD', nonProfit:75,  minimum:90,  maximum:120, keywords:['xr','iphone xr'] },
+  { id:'d14', brand:'iPhone', model:'iPhone 11',          repairType:'LCD', nonProfit:75,  minimum:90,  maximum:130, keywords:['11 lcd','iphone 11'] },
+  { id:'d15', brand:'iPhone', model:'iPhone 11 Pro',      repairType:'LCD', nonProfit:80,  minimum:100, maximum:130, keywords:['11 pro','11pro'] },
+  { id:'d16', brand:'iPhone', model:'iPhone 11 Pro Max',  repairType:'LCD', nonProfit:100, minimum:120, maximum:150, keywords:['11 pm','11 pro max','11promax','11pm'] },
+  { id:'d17', brand:'iPhone', model:'iPhone 12 / 12 Pro', repairType:'LCD', nonProfit:90,  minimum:120, maximum:160, keywords:['12 lcd','12pro','iphone 12','12/12pro'] },
+  { id:'d18', brand:'iPhone', model:'iPhone 12 Pro Max',  repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['12 pm','12 pro max','12promax','12pm'] },
+  { id:'d19', brand:'iPhone', model:'iPhone 12 Mini',     repairType:'LCD', nonProfit:90,  minimum:120, maximum:160, keywords:['12 mini','12mini'] },
+  { id:'d20', brand:'iPhone', model:'iPhone 13',          repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['13 lcd','iphone 13'] },
+  { id:'d21', brand:'iPhone', model:'iPhone 13 Mini',     repairType:'LCD', nonProfit:115, minimum:140, maximum:180, keywords:['13 mini','13mini'] },
+  { id:'d22', brand:'iPhone', model:'iPhone 13 Pro',      repairType:'LCD', nonProfit:130, minimum:150, maximum:200, keywords:['13 pro','13pro'] },
+  { id:'d23', brand:'iPhone', model:'iPhone 13 Pro Max',  repairType:'LCD', nonProfit:140, minimum:180, maximum:320, keywords:['13 pm','13 pro max','13promax','13pm','iphone 13 pro max'] },
+  { id:'d24', brand:'iPhone', model:'iPhone 14',          repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['14 lcd','iphone 14'] },
+  { id:'d25', brand:'iPhone', model:'iPhone 14 Plus',     repairType:'LCD', nonProfit:140, minimum:160, maximum:200, keywords:['14 plus','14+','14plus'] },
+  { id:'d26', brand:'iPhone', model:'iPhone 14 Pro',      repairType:'LCD', nonProfit:145, minimum:180, maximum:220, keywords:['14 pro','14pro'] },
+  { id:'d27', brand:'iPhone', model:'iPhone 14 Pro Max',  repairType:'LCD', nonProfit:185, minimum:250, maximum:250, keywords:['14 pm','14 pro max','14promax','14pm'] },
+  { id:'d28', brand:'iPhone', model:'iPhone 15',          repairType:'LCD', nonProfit:130, minimum:160, maximum:200, keywords:['15 lcd','iphone 15'] },
+  { id:'d29', brand:'iPhone', model:'iPhone 15 Plus',     repairType:'LCD', nonProfit:140, minimum:180, maximum:230, keywords:['15 plus','15+','15plus'] },
+  { id:'d30', brand:'iPhone', model:'iPhone 15 Pro',      repairType:'LCD', nonProfit:145, minimum:190, maximum:260, keywords:['15 pro','15pro'] },
+  { id:'d31', brand:'iPhone', model:'iPhone 15 Pro Max',  repairType:'LCD', nonProfit:190, minimum:280, maximum:350, keywords:['15 pm','15 pro max','15promax','15pm'] },
+  { id:'d32', brand:'iPhone', model:'iPhone 16',          repairType:'LCD', nonProfit:140, minimum:170, maximum:220, keywords:['16 lcd','iphone 16'] },
+  { id:'d33', brand:'iPhone', model:'iPhone 16e',         repairType:'LCD', nonProfit:130, minimum:170, maximum:180, keywords:['16e','16 e'] },
+  { id:'d34', brand:'iPhone', model:'iPhone 16 Plus',     repairType:'LCD', nonProfit:150, minimum:200, maximum:250, keywords:['16 plus','16+','16plus'] },
+  { id:'d35', brand:'iPhone', model:'iPhone 16 Pro',      repairType:'LCD', nonProfit:140, minimum:200, maximum:220, keywords:['16 pro','16pro'] },
+  { id:'d36', brand:'iPhone', model:'iPhone 16 Pro Max',  repairType:'LCD', nonProfit:200, minimum:250, maximum:320, keywords:['16 pm','16 pro max','16promax','16pm'] },
+  { id:'d37', brand:'iPhone', model:'iPhone 17',          repairType:'LCD', nonProfit:280, minimum:300, maximum:380, keywords:['17 lcd','iphone 17'] },
+  { id:'d38', brand:'iPhone', model:'iPhone 17 Pro',      repairType:'LCD', nonProfit:290, minimum:350, maximum:400, keywords:['17 pro','17pro'] },
+  { id:'d39', brand:'iPhone', model:'iPhone 17 Pro Max',  repairType:'LCD', nonProfit:340, minimum:390, maximum:450, keywords:['17 pm','17 pro max','17promax','17pm'] },
 
-  // ── Identity ────────────────────────────────────────────
-  USER_NAME: 'Mr. Kritesh',     // Change via Settings modal
+  // ---- iPHONE CAMERA ----
+  { id:'d40', brand:'iPhone', model:'iPhone Camera (X – 12 Pro Max)', repairType:'Camera', minimum:80,  maximum:100, keywords:['iphone camera','x camera','11 camera','12 camera','xs camera','xr camera'] },
+  { id:'d41', brand:'iPhone', model:'iPhone Camera (13 / 14 / 14 Plus / 15 / 15 Plus)', repairType:'Camera', minimum:100, maximum:130, keywords:['13 camera','14 camera','15 camera','14 plus camera','15 plus camera'] },
+  { id:'d42', brand:'iPhone', model:'iPhone Camera (13 Pro / 13 PM / 14 Pro / 14 PM)', repairType:'Camera', minimum:150, maximum:200, keywords:['13 pro camera','14 pro camera','13pm camera','14pm camera','13 pro max camera','14 pro max camera'] },
 
-  // ── Backend ─────────────────────────────────────────────
-  // Set these in Settings modal (stored in localStorage, never hard-coded here)
-  // BACKEND_URL: 'https://your-api.com'  ← paste in Settings
+  // ---- iPHONE PROXIMITY ----
+  { id:'d43', brand:'iPhone', model:'iPhone Proximity (All models up to 12 Pro Max)', repairType:'Proximity', minimum:60, maximum:80, keywords:['proximity','iphone proximity','6 proximity','7 proximity','8 proximity','x proximity','11 proximity','12 proximity'] },
+  { id:'d44', brand:'iPhone', model:'iPhone Proximity (13 – 15 Pro Max)', repairType:'Proximity', minimum:80, maximum:100, keywords:['13 proximity','14 proximity','15 proximity','proximity 13','proximity 14','proximity 15'] },
 
-  // ── Models available ────────────────────────────────────
-  MODELS: [
-    { id: 'gpt-4o',           label: 'GPT-4o' },
-    { id: 'gpt-4-turbo',      label: 'GPT-4 Turbo' },
-    { id: 'gpt-3.5-turbo',    label: 'GPT-3.5 Turbo' },
-    { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
-    { id: 'gemini-1.5-pro',   label: 'Gemini 1.5 Pro' },
-  ],
-};
+  // ---- iPHONE CHARGING PORT / SPEAKER ----
+  { id:'d45', brand:'iPhone', model:'iPhone Charging Port / Speaker (Up to 12 Pro Max)', repairType:'Charging Port', minimum:60, maximum:100, keywords:['iphone charging','iphone port','charging port','6 port','7 port','8 port','x port','11 port','12 port','speaker','loud speaker'] },
+  { id:'d46', brand:'iPhone', model:'iPhone Charging Port / Speaker (13 – 15 Pro Max)', repairType:'Charging Port', minimum:80, maximum:160, keywords:['13 port','14 port','15 port','13 charging','14 charging','15 charging','13 speaker','14 speaker','15 speaker'] },
 
-// ================================================================
-// STATE
-// ================================================================
-const STATE = {
-  // Session
-  authenticated: false,
-  stayLoggedIn: true,
-  pinAttempts: 0,
-  pinBuffer: '',
+  // ---- iPHONE BATTERY ----
+  { id:'d47', brand:'iPhone', model:'iPhone Battery (8 / SE / X / XS / XS Max / XR)', repairType:'Battery', minimum:70, maximum:90, keywords:['8 battery','se battery','x battery','xs battery','xr battery','xsmax battery'] },
+  { id:'d48', brand:'iPhone', model:'iPhone Battery (11 / 11 Pro / 11 Pro Max)', repairType:'Battery', minimum:80, maximum:100, keywords:['11 battery','11 pro battery','11 pm battery','11promax battery'] },
+  { id:'d49', brand:'iPhone', model:'iPhone Battery (12 / 12 Pro / 12 Pro Max)', repairType:'Battery', minimum:90, maximum:120, keywords:['12 battery','12 pro battery','12pm battery','12promax battery'] },
+  { id:'d50', brand:'iPhone', model:'iPhone Battery (13 / 13 Pro / 13 Pro Max)', repairType:'Battery', minimum:80, maximum:120, keywords:['13 battery','13 pro battery','13pm battery','13 mini battery'] },
+  { id:'d51', brand:'iPhone', model:'iPhone Battery (14 / 14 Plus)', repairType:'Battery', minimum:80, maximum:120, keywords:['14 battery','14 plus battery'] },
+  { id:'d52', brand:'iPhone', model:'iPhone Battery (14 Pro / 14 Pro Max)', repairType:'Battery', minimum:100, maximum:140, keywords:['14 pro battery','14pm battery','14promax battery'] },
+  { id:'d53', brand:'iPhone', model:'iPhone Battery (15 / 15 Plus)', repairType:'Battery', minimum:100, maximum:150, keywords:['15 battery','15 plus battery'] },
+  { id:'d54', brand:'iPhone', model:'iPhone Battery (15 Pro / 15 Pro Max)', repairType:'Battery', minimum:120, maximum:180, keywords:['15 pro battery','15pm battery','15promax battery'] },
+  { id:'d55', brand:'iPhone', model:'iPhone Battery (16 Pro Max)', repairType:'Battery', minimum:140, maximum:200, keywords:['16 pro max battery','16pm battery','16promax battery'] },
 
-  // Voice
-  voiceOutputEnabled: true,
-  voiceInputActive: false,
-  recognition: null,
-  voices: [],
-  selectedVoice: null,
-  voiceRate: 1.0,
-  voicePitch: 0.9,
+  // ---- SAMSUNG LCD ----
+  { id:'d60', brand:'Samsung', model:'Samsung S8',         repairType:'LCD', nonProfit:140, minimum:170, maximum:200, keywords:['s8','galaxy s8'] },
+  { id:'d61', brand:'Samsung', model:'Samsung S8 Plus',    repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s8+','s8 plus'] },
+  { id:'d62', brand:'Samsung', model:'Samsung S9',         repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s9','galaxy s9'] },
+  { id:'d63', brand:'Samsung', model:'Samsung S9 Plus',    repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s9+','s9 plus'] },
+  { id:'d64', brand:'Samsung', model:'Samsung S10',        repairType:'LCD', nonProfit:145, minimum:180, maximum:220, keywords:['s10','galaxy s10'] },
+  { id:'d65', brand:'Samsung', model:'Samsung S10e',       repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s10e','s10 e'] },
+  { id:'d66', brand:'Samsung', model:'Samsung S10 Plus',   repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s10+','s10 plus'] },
+  { id:'d67', brand:'Samsung', model:'Samsung S10 5G',     repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s10 5g'] },
+  { id:'d68', brand:'Samsung', model:'Samsung S10 Lite',   repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s10 lite'] },
+  { id:'d69', brand:'Samsung', model:'Samsung S20',        repairType:'LCD', nonProfit:160, minimum:190, maximum:240, keywords:['s20','galaxy s20'] },
+  { id:'d70', brand:'Samsung', model:'Samsung S20 FE',     repairType:'LCD', nonProfit:180, minimum:200, maximum:240, keywords:['s20 fe','s20fe'] },
+  { id:'d71', brand:'Samsung', model:'Samsung S20 Plus',   repairType:'LCD', nonProfit:195, minimum:220, maximum:260, keywords:['s20+','s20 plus'] },
+  { id:'d72', brand:'Samsung', model:'Samsung S20 Ultra',  repairType:'LCD', nonProfit:200, minimum:240, maximum:280, keywords:['s20 ultra','s20ultra'] },
+  { id:'d73', brand:'Samsung', model:'Samsung S21',        repairType:'LCD', nonProfit:170, minimum:200, maximum:240, keywords:['s21','galaxy s21'] },
+  { id:'d74', brand:'Samsung', model:'Samsung S21 FE',     repairType:'LCD', nonProfit:195, minimum:230, maximum:280, keywords:['s21 fe','s21fe'] },
+  { id:'d75', brand:'Samsung', model:'Samsung S21 Ultra',  repairType:'LCD', nonProfit:200, minimum:230, maximum:280, keywords:['s21 ultra','s21ultra'] },
+  { id:'d76', brand:'Samsung', model:'Samsung S22',        repairType:'LCD', nonProfit:200, minimum:230, maximum:280, keywords:['s22','galaxy s22'] },
+  { id:'d77', brand:'Samsung', model:'Samsung S22 Plus',   repairType:'LCD', nonProfit:200, minimum:230, maximum:280, keywords:['s22+','s22 plus'] },
+  { id:'d78', brand:'Samsung', model:'Samsung S22 Ultra',  repairType:'LCD', nonProfit:220, minimum:250, maximum:300, keywords:['s22 ultra','s22ultra'] },
+  { id:'d79', brand:'Samsung', model:'Samsung S23',        repairType:'LCD', nonProfit:205, minimum:230, maximum:280, keywords:['s23','galaxy s23'] },
+  { id:'d80', brand:'Samsung', model:'Samsung S23 Plus',   repairType:'LCD', nonProfit:220, minimum:250, maximum:280, keywords:['s23+','s23 plus'] },
+  { id:'d81', brand:'Samsung', model:'Samsung S23 FE',     repairType:'LCD', nonProfit:220, minimum:250, maximum:240, keywords:['s23 fe','s23fe'] },
+  { id:'d82', brand:'Samsung', model:'Samsung S23 Ultra',  repairType:'LCD', nonProfit:240, minimum:260, maximum:350, keywords:['s23 ultra','s23ultra'] },
+  { id:'d83', brand:'Samsung', model:'Samsung Note 8',     repairType:'LCD', nonProfit:190, minimum:210, maximum:250, keywords:['note 8','note8'] },
+  { id:'d84', brand:'Samsung', model:'Samsung Note 9',     repairType:'LCD', nonProfit:190, minimum:220, maximum:250, keywords:['note 9','note9'] },
+  { id:'d85', brand:'Samsung', model:'Samsung Note 10',    repairType:'LCD', nonProfit:200, minimum:230, maximum:260, keywords:['note 10','note10'] },
+  { id:'d86', brand:'Samsung', model:'Samsung Note 10 Plus', repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['note 10+','note 10 plus','note10+'] },
+  { id:'d87', brand:'Samsung', model:'Samsung Note 20',    repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['note 20','note20'] },
+  { id:'d88', brand:'Samsung', model:'Samsung Note 20 Ultra', repairType:'LCD', nonProfit:230, minimum:250, maximum:300, keywords:['note 20 ultra','note20ultra'] },
+  { id:'d89', brand:'Samsung', model:'Samsung A10e',       repairType:'LCD', nonProfit:70,  minimum:70,  maximum:80,  keywords:['a10e','a 10e'] },
+  { id:'d90', brand:'Samsung', model:'Samsung A02s',       repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a02s','a 02s'] },
+  { id:'d91', brand:'Samsung', model:'Samsung A03s',       repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a03s'] },
+  { id:'d92', brand:'Samsung', model:'Samsung A11',        repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a11'] },
+  { id:'d93', brand:'Samsung', model:'Samsung A12',        repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a12'] },
+  { id:'d94', brand:'Samsung', model:'Samsung A13',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a13'] },
+  { id:'d95', brand:'Samsung', model:'Samsung A14',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a14'] },
+  { id:'d96', brand:'Samsung', model:'Samsung A15',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:160, keywords:['a15'] },
+  { id:'d97', brand:'Samsung', model:'Samsung A20',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a20'] },
+  { id:'d98', brand:'Samsung', model:'Samsung A21',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a21'] },
+  { id:'d99', brand:'Samsung', model:'Samsung A23',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a23'] },
+  { id:'d100',brand:'Samsung', model:'Samsung A32',        repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a32'] },
+  { id:'d101',brand:'Samsung', model:'Samsung A42',        repairType:'LCD', nonProfit:100, minimum:110, maximum:130, keywords:['a42'] },
+  { id:'d102',brand:'Samsung', model:'Samsung A43',        repairType:'LCD', nonProfit:100, minimum:110, maximum:130, keywords:['a43'] },
+  { id:'d103',brand:'Samsung', model:'Samsung A52',        repairType:'LCD', nonProfit:90,  minimum:110, maximum:130, keywords:['a52'] },
+  { id:'d104',brand:'Samsung', model:'Samsung A53',        repairType:'LCD', nonProfit:120, minimum:140, maximum:160, keywords:['a53'] },
+  { id:'d105',brand:'Samsung', model:'Samsung A54',        repairType:'LCD', nonProfit:160, minimum:190, maximum:240, keywords:['a54'] },
+  { id:'d106',brand:'Samsung', model:'Samsung A55',        repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a55'] },
+  { id:'d107',brand:'Samsung', model:'Samsung A70',        repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a70'] },
+  { id:'d108',brand:'Samsung', model:'Samsung A71',        repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a71'] },
+  { id:'d109',brand:'Samsung', model:'Samsung A73',        repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a73'] },
 
-  // Chat
-  chatHistory: [],         // { role, text, ts }
-  activeModel: 'gpt-4o',
+  // ---- SAMSUNG BATTERY ----
+  { id:'d110',brand:'Samsung', model:'Samsung Battery (All A Series)', repairType:'Battery', minimum:60, maximum:80, keywords:['samsung battery','a series battery','samsung a battery'] },
+  { id:'d111',brand:'Samsung', model:'Samsung Battery (All S Series)', repairType:'Battery', minimum:120, maximum:120, keywords:['samsung s battery','s series battery','s20 battery','s21 battery','s22 battery','s23 battery'] },
 
-  // Settings
-  apiKey: '',
-  backendUrl: '',
-  userName: 'Mr. Kritesh',
+  // ---- SAMSUNG CHARGING PORT ----
+  { id:'d112',brand:'Samsung', model:'Samsung Charging Port (All A Series)', repairType:'Charging Port', minimum:60, maximum:90, keywords:['samsung charging','samsung a port','samsung a charging'] },
+  { id:'d113',brand:'Samsung', model:'Samsung Charging Port (All S Series)', repairType:'Charging Port', minimum:70, maximum:110, keywords:['samsung s port','samsung s charging','s21 port','s22 port','s23 port'] },
 
-  // System
-  backendOnline: false,
-  systemLog: [],
-};
+  // ---- MOTOROLA LCD ----
+  { id:'d120',brand:'Motorola', model:'Moto G Stylus 2020 (XT2043)',   repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['moto stylus','g stylus','stylus 2020','xt2043','moto g stylus'] },
+  { id:'d121',brand:'Motorola', model:'Moto G Stylus 2021 4G (XT2115)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2021','xt2115','g stylus 2021 4g'] },
+  { id:'d122',brand:'Motorola', model:'Moto G Stylus 2021 5G (XT2131)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2021 5g','xt2131','g stylus 2021 5g'] },
+  { id:'d123',brand:'Motorola', model:'Moto G Stylus 2022 (XT2211)',   repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2022','xt2211','g stylus 2022'] },
+  { id:'d124',brand:'Motorola', model:'Moto G Stylus 2023 (XT2315)',   repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['stylus 2023','xt2315','g stylus 2023','moto stylus 2023'] },
+  { id:'d125',brand:'Motorola', model:'Moto G 5G 2022 (XT2213)',       repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g 5g 2022','xt2213','moto g 5g 2022'] },
+  { id:'d126',brand:'Motorola', model:'Moto G 5G 2023 (XT2313)',       repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['g 5g 2023','xt2313','moto g 5g 2023'] },
+  { id:'d127',brand:'Motorola', model:'Moto One 5G Ace / G 5G (XT2113)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['one 5g ace','xt2113','one 5g'] },
+  { id:'d128',brand:'Motorola', model:'Moto G Pure (XT2163)',           repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g pure','xt2163','moto g pure'] },
+  { id:'d129',brand:'Motorola', model:'Moto G Play 2023 (XT2271)',     repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['g play 2023','xt2271','moto g play'] },
+  { id:'d130',brand:'Motorola', model:'Moto G Fast (XT2045)',          repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g fast','xt2045','moto g fast'] },
+  { id:'d131',brand:'Motorola', model:'Moto G Power 2022 (XT2165)',    repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g power 2022','xt2165','moto g power 2022'] },
+  { id:'d132',brand:'Motorola', model:'Moto G Power 5G 2023 (XT2311)', repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['g power 5g','xt2311','moto g power 5g'] },
+  { id:'d133',brand:'Motorola', model:'Moto G Power (XT2041)',         repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g power xt2041','xt2041'] },
+  { id:'d134',brand:'Motorola', model:'Moto G Power / G10 Play 2021 (XT2117)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g10 play','xt2117','g power 2021'] },
 
-// ================================================================
-// DOM HELPERS
-// ================================================================
-const $  = id  => document.getElementById(id);
-const $$ = sel => document.querySelector(sel);
+  // ---- MOTOROLA BATTERY ----
+  { id:'d135',brand:'Motorola', model:'Motorola Battery (All Models)', repairType:'Battery', minimum:80, maximum:100, keywords:['motorola battery','moto battery','moto g battery'] },
 
-// ================================================================
-// LOCAL STORAGE KEYS
-// ================================================================
-const LS = {
-  AUTH:        'aria_auth',
-  PIN:         'aria_pin',
-  API_KEY:     'aria_apikey',
-  BACKEND_URL: 'aria_backend_url',
-  CHAT:        'aria_chat',
-  EXPENSES:    'aria_expenses',
-  VOICE_ON:    'aria_voice_on',
-  VOICE_RATE:  'aria_voice_rate',
-  VOICE_PITCH: 'aria_voice_pitch',
-  VOICE_IDX:   'aria_voice_idx',
-  MODEL:       'aria_model',
-  USERNAME:    'aria_username',
-  STAY_IN:     'aria_stay_logged',
-  FIRST_USE:   'aria_first_use',
-};
+  // ---- MOTOROLA CHARGING PORT ----
+  { id:'d136',brand:'Motorola', model:'Motorola Charging Port (All Models)', repairType:'Charging Port', minimum:60, maximum:90, keywords:['motorola port','moto port','moto charging','motorola charging'] },
 
-// ================================================================
-// BOOT SEQUENCE
-// ================================================================
-const BOOT_MSGS = [
-  'Initializing ARIA core systems…',
-  'Loading neural reasoning engine…',
-  'Checking server connectivity…',
-  'Voice module online…',
-  'Automation core ready…',
-  'ARIA online. Welcome back.',
+  // ---- GOOGLE PIXEL LCD ----
+  { id:'d140',brand:'Google Pixel', model:'Pixel 6',      repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['pixel 6','google pixel 6','p6'] },
+  { id:'d141',brand:'Google Pixel', model:'Pixel 6A',     repairType:'LCD', nonProfit:140, minimum:150, maximum:180, keywords:['pixel 6a','pixel6a','p6a'] },
+  { id:'d142',brand:'Google Pixel', model:'Pixel 7',      repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['pixel 7','google pixel 7','p7'] },
+  { id:'d143',brand:'Google Pixel', model:'Pixel 7A',     repairType:'LCD', nonProfit:140, minimum:150, maximum:180, keywords:['pixel 7a','pixel7a','p7a'] },
+  { id:'d144',brand:'Google Pixel', model:'Pixel 7 Pro',  repairType:'LCD', nonProfit:150, minimum:180, maximum:null, keywords:['pixel 7 pro','pixel7pro','p7 pro'] },
+  { id:'d145',brand:'Google Pixel', model:'Pixel 8A',     repairType:'LCD', nonProfit:140, minimum:180, maximum:null, keywords:['pixel 8a','pixel8a','p8a'] },
+  { id:'d146',brand:'Google Pixel', model:'Pixel 8 Pro',  repairType:'LCD', nonProfit:150, minimum:180, maximum:null, keywords:['pixel 8 pro','pixel8pro','p8 pro'] },
+  { id:'d147',brand:'Google Pixel', model:'Pixel 9A',     repairType:'LCD', nonProfit:160, minimum:190, maximum:null, keywords:['pixel 9a','pixel9a','p9a'] },
+  { id:'d148',brand:'Google Pixel', model:'Pixel 9 Pro',  repairType:'LCD', nonProfit:155, minimum:200, maximum:null, keywords:['pixel 9 pro','pixel9pro','p9 pro'] },
+  { id:'d149',brand:'Google Pixel', model:'Pixel 9 Pro XL', repairType:'LCD', nonProfit:250, minimum:320, maximum:null, keywords:['pixel 9 pro xl','pixel9proxl','9 pro xl'] },
+
+  // ---- iPAD LCD ----
+  { id:'d160',brand:'iPad', model:'iPad 5/6 Touch Digitizer',    repairType:'LCD', nonProfit:90,  minimum:120, maximum:150, keywords:['ipad 5','ipad 6','ipad digitizer','ipad 5 touch','ipad 6 touch'] },
+  { id:'d161',brand:'iPad', model:'iPad 7/8/9 Touch Digitizer',  repairType:'LCD', nonProfit:90,  minimum:120, maximum:180, keywords:['ipad 7','ipad 8','ipad 9','ipad 7 digitizer'] },
+  { id:'d162',brand:'iPad', model:'iPad 7/8/9 LCD',              repairType:'LCD', nonProfit:120, minimum:150, maximum:180, keywords:['ipad 7 lcd','ipad 8 lcd','ipad 9 lcd'] },
+  { id:'d163',brand:'iPad', model:'iPad 10 Touch Digitizer',     repairType:'LCD', nonProfit:100, minimum:120, maximum:180, keywords:['ipad 10 touch','ipad 10 digitizer'] },
+  { id:'d164',brand:'iPad', model:'iPad 10 LCD',                 repairType:'LCD', nonProfit:155, minimum:190, maximum:240, keywords:['ipad 10 lcd','ipad 10th gen'] },
+  { id:'d165',brand:'iPad', model:'iPad 5/6 LCD',                repairType:'LCD', nonProfit:120, minimum:130, maximum:160, keywords:['ipad 5 lcd','ipad 6 lcd'] },
+  { id:'d166',brand:'iPad', model:'iPad Air 1 Touch Digitizer',  repairType:'LCD', nonProfit:90,  minimum:110, maximum:140, keywords:['air 1 touch','ipad air 1 digitizer'] },
+  { id:'d167',brand:'iPad', model:'iPad Air 1 LCD',              repairType:'LCD', nonProfit:100, minimum:120, maximum:150, keywords:['air 1 lcd','ipad air 1 lcd'] },
+  { id:'d168',brand:'iPad', model:'iPad Air 2',                  repairType:'LCD', nonProfit:130, minimum:150, maximum:180, keywords:['air 2','ipad air 2'] },
+  { id:'d169',brand:'iPad', model:'iPad Air 3',                  repairType:'LCD', nonProfit:130, minimum:150, maximum:180, keywords:['air 3','ipad air 3'] },
+  { id:'d170',brand:'iPad', model:'iPad Air 4',                  repairType:'LCD', nonProfit:175, minimum:200, maximum:240, keywords:['air 4','ipad air 4'] },
+  { id:'d171',brand:'iPad', model:'iPad Air 5',                  repairType:'LCD', nonProfit:180, minimum:200, maximum:250, keywords:['air 5','ipad air 5'] },
+  { id:'d172',brand:'iPad', model:'iPad Mini 1/2 Touch Digitizer', repairType:'LCD', nonProfit:85, minimum:100, maximum:140, keywords:['mini 1','mini 2','ipad mini 1','ipad mini 2','mini touch'] },
+  { id:'d173',brand:'iPad', model:'iPad Mini 1/2 LCD',           repairType:'LCD', nonProfit:160, minimum:200, maximum:290, keywords:['mini 1 lcd','mini 2 lcd','ipad mini 1 lcd','ipad mini 2 lcd'] },
+  { id:'d174',brand:'iPad', model:'iPad Mini 3 Touch Digitizer', repairType:'LCD', nonProfit:180, minimum:210, maximum:360, keywords:['mini 3 touch','ipad mini 3 digitizer'] },
+  { id:'d175',brand:'iPad', model:'iPad Mini 3 LCD',             repairType:'LCD', nonProfit:180, minimum:220, maximum:360, keywords:['mini 3 lcd','ipad mini 3 lcd'] },
+  { id:'d176',brand:'iPad', model:'iPad Mini 4 LCD',             repairType:'LCD', nonProfit:190, minimum:240, maximum:360, keywords:['mini 4','ipad mini 4'] },
+  { id:'d177',brand:'iPad', model:'iPad Mini 5 LCD',             repairType:'LCD', nonProfit:220, minimum:280, maximum:360, keywords:['mini 5','ipad mini 5'] },
+  { id:'d178',brand:'iPad', model:'iPad Mini 6 LCD',             repairType:'LCD', nonProfit:270, minimum:320, maximum:360, keywords:['mini 6','ipad mini 6'] },
+  { id:'d179',brand:'iPad', model:'iPad Pro 10.5 LCD',           repairType:'LCD', nonProfit:180, minimum:190, maximum:230, keywords:['pro 10.5','ipad pro 10','10.5 lcd'] },
+  { id:'d180',brand:'iPad', model:'iPad Pro 11 LCD (Gen 1/2)',   repairType:'LCD', nonProfit:190, minimum:220, maximum:260, keywords:['pro 11 gen 1','pro 11 gen 2','ipad pro 11 g1','ipad pro 11 g2'] },
+  { id:'d181',brand:'iPad', model:'iPad Pro 11 LCD (Gen 3/4)',   repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['pro 11 gen 3','pro 11 gen 4','ipad pro 11 g3','ipad pro 11 g4'] },
+  { id:'d182',brand:'iPad', model:'iPad Pro 12.9 LCD (Gen 3/4)', repairType:'LCD', nonProfit:200, minimum:220, maximum:260, keywords:['pro 12.9 gen 3','pro 12.9 gen 4','ipad pro 12 g3'] },
+  { id:'d183',brand:'iPad', model:'iPad Pro 12.9 LCD (Gen 5/6)', repairType:'LCD', nonProfit:275, minimum:300, maximum:380, keywords:['pro 12.9 gen 5','pro 12.9 gen 6','ipad pro 12 g5','ipad pro 12 g6'] },
+
+  // ---- iPAD BATTERY ----
+  { id:'d190',brand:'iPad', model:'iPad Battery (All iPads)', repairType:'Battery', minimum:130, maximum:180, keywords:['ipad battery','ipad air battery','ipad mini battery','ipad pro battery'] },
+
+  // ---- iPAD CHARGING PORT ----
+  { id:'d191',brand:'iPad', model:'iPad Charging Port (All iPads)', repairType:'Charging Port', minimum:140, maximum:180, keywords:['ipad charging','ipad port','ipad charging port'] },
 ];
 
-async function runBoot() {
-  const bar    = $('boot-bar');
-  const pctEl  = $('boot-pct');
+// -----------------------------------------------
+// QUICK-ACCESS chips on homepage
+// -----------------------------------------------
+const QUICK_REPAIRS = [
+  { label:'iPhone 11 LCD',           icon:'📱', searchFor:'iPhone 11 LCD' },
+  { label:'iPhone 13 LCD',           icon:'📱', searchFor:'iPhone 13 LCD' },
+  { label:'iPhone 13 Pro Max LCD',   icon:'📱', searchFor:'iPhone 13 Pro Max' },
+  { label:'iPhone 14 Pro LCD',       icon:'📱', searchFor:'iPhone 14 Pro LCD' },
+  { label:'iPhone 15 Pro Max LCD',   icon:'📱', searchFor:'iPhone 15 Pro Max' },
+  { label:'iPhone 16 Pro Max LCD',   icon:'📱', searchFor:'iPhone 16 Pro Max' },
+  { label:'Samsung S23 Ultra LCD',   icon:'📱', searchFor:'S23 Ultra' },
+  { label:'Pixel 8A LCD',            icon:'📱', searchFor:'Pixel 8A' },
+  { label:'iPhone Battery',          icon:'🔋', searchFor:'iPhone Battery' },
+  { label:'iPhone Charging Port',    icon:'🔌', searchFor:'iPhone Charging Port' },
+  { label:'Samsung Battery',         icon:'🔋', searchFor:'Samsung Battery' },
+  { label:'iPad Battery',            icon:'🔋', searchFor:'iPad Battery' },
+];
 
-  for (let i = 0; i < BOOT_MSGS.length; i++) {
-    await sleep(i === 0 ? 200 : 380 + Math.random() * 200);
-    const pct = Math.round(((i + 1) / BOOT_MSGS.length) * 100);
-    bar.style.width = pct + '%';
-    pctEl.textContent = pct + '%';
+// -----------------------------------------------
+// STORAGE HELPERS
+// -----------------------------------------------
+const LS_KEY = 'techyRepairData';
 
-    // Mark previous as done, current as active
-    for (let j = 0; j <= i; j++) {
-      const el = $(`blog-${j}`);
-      if (el) el.className = j === i ? 'boot-log-line active' : 'boot-log-line done';
+function loadData() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
-  }
+  } catch(e) {}
+  return null;
+}
 
-  await sleep(500);
+function saveData(data) {
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+}
 
-  // Check if session is still valid
-  const savedAuth = localStorage.getItem(LS.AUTH);
-  const stayIn    = localStorage.getItem(LS.STAY_IN) !== 'false';
-
-  if (savedAuth === 'true' && stayIn) {
-    STATE.authenticated = true;
-    switchScreen('screen-boot', 'screen-connect');
-    runConnectSequence();
+function initData() {
+  const stored = loadData();
+  if (stored) {
+    repairs = stored;
   } else {
-    switchScreen('screen-boot', 'screen-access');
+    repairs = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    saveData(repairs);
   }
 }
 
-// ================================================================
-// SCREEN TRANSITIONS
-// ================================================================
-function switchScreen(fromId, toId) {
-  const from = $(fromId);
-  const to   = $(toId);
-  if (from) from.classList.remove('active');
-  if (to) {
-    to.classList.add('active');
-    // Dashboard needs special handling
-    if (toId === 'screen-dashboard') {
-      to.style.display = 'block';
-    }
-  }
-}
-
-// ================================================================
-// PIN ACCESS
-// ================================================================
-function initPinPad() {
-  // Number keys
-  document.querySelectorAll('.pin-key[data-val]').forEach(btn => {
-    btn.addEventListener('click', () => pinDigit(btn.dataset.val));
-  });
-
-  $('pin-clear-btn').addEventListener('click', pinClear);
-  $('pin-enter-btn').addEventListener('click', pinSubmit);
-
-  // Physical keyboard support
-  document.addEventListener('keydown', e => {
-    if (!$('screen-access').classList.contains('active')) return;
-    if (/^[0-9]$/.test(e.key)) pinDigit(e.key);
-    if (e.key === 'Backspace') pinClear();
-    if (e.key === 'Enter') pinSubmit();
-  });
-
-  updatePinDisplay();
-}
-
-function pinDigit(digit) {
-  if (STATE.pinBuffer.length >= 4) return;
-  STATE.pinBuffer += digit;
-  updatePinDisplay();
-  if (STATE.pinBuffer.length === 4) setTimeout(pinSubmit, 200);
-}
-
-function pinClear() {
-  STATE.pinBuffer = '';
-  updatePinDisplay();
-  const err = $('pin-error');
-  err.classList.add('hidden');
-}
-
-function updatePinDisplay() {
-  for (let i = 0; i < 4; i++) {
-    const dot = $(`pd${i}`);
-    if (dot) dot.className = i < STATE.pinBuffer.length ? 'pin-dot filled' : 'pin-dot';
-  }
-}
-
-function pinSubmit() {
-  const stored = localStorage.getItem(LS.PIN) || CONFIG.DEFAULT_PIN;
-  if (STATE.pinBuffer === stored) {
-    pinSuccess();
-  } else {
-    pinFail();
-  }
-}
-
-function pinSuccess() {
-  STATE.authenticated = true;
-  STATE.pinBuffer = '';
-  updatePinDisplay();
-  $('pin-error').classList.add('hidden');
-
-  const stayIn = localStorage.getItem(LS.STAY_IN) !== 'false';
-  if (stayIn) localStorage.setItem(LS.AUTH, 'true');
-
-  switchScreen('screen-access', 'screen-connect');
-  runConnectSequence();
-}
-
-function pinFail() {
-  STATE.pinAttempts++;
-  STATE.pinBuffer = '';
-  updatePinDisplay();
-  const err = $('pin-error');
-  err.classList.remove('hidden');
-  // Re-hide after 2.5s
-  setTimeout(() => err.classList.add('hidden'), 2500);
-}
-
-// ================================================================
-// CONNECT SEQUENCE (after login)
-// ================================================================
-async function runConnectSequence() {
-  const lines = [$('cl-0'), $('cl-1'), $('cl-2'), $('cl-3')];
-
-  for (let i = 0; i < lines.length; i++) {
-    await sleep(500 + i * 400);
-    if (lines[i - 1]) {
-      lines[i - 1].className = 'connect-line done';
-      lines[i - 1].querySelector('.cline-dot').className = 'cline-dot done';
-    }
-    lines[i].className = 'connect-line active';
-    lines[i].querySelector('.cline-dot').className = 'cline-dot active';
-  }
-
-  await sleep(500);
-  lines[lines.length - 1].className = 'connect-line done';
-
-  await sleep(600);
-  switchScreen('screen-connect', 'screen-dashboard');
-  onDashboardReady();
-}
-
-// ================================================================
-// DASHBOARD INIT
-// ================================================================
-function onDashboardReady() {
-  loadAllSettings();
-  initSidebar();
-  initTopbar();
-  initChat();
-  initVoice();
-  initCommands();
-  initExpenses();
-  initMemory();
-  initStatus();
-  initSettingsModal();
-  initBriefingModal();
-  checkBackendStatus();
-  sysLog('ARIA dashboard loaded.', 'ok');
-  sysLog(`Session started — model: ${STATE.activeModel}`, 'info');
-}
-
-// ================================================================
-// SETTINGS: LOAD ALL
-// ================================================================
-function loadAllSettings() {
-  STATE.apiKey         = localStorage.getItem(LS.API_KEY)     || '';
-  STATE.backendUrl     = localStorage.getItem(LS.BACKEND_URL) || '';
-  STATE.voiceOutputEnabled = localStorage.getItem(LS.VOICE_ON) !== 'false';
-  STATE.voiceRate      = parseFloat(localStorage.getItem(LS.VOICE_RATE)  ?? '1.0');
-  STATE.voicePitch     = parseFloat(localStorage.getItem(LS.VOICE_PITCH) ?? '0.9');
-  STATE.activeModel    = localStorage.getItem(LS.MODEL)        || 'gpt-4o';
-  STATE.userName       = localStorage.getItem(LS.USERNAME)     || CONFIG.USER_NAME;
-  STATE.stayLoggedIn   = localStorage.getItem(LS.STAY_IN)     !== 'false';
-
-  // Seed first-use date
-  if (!localStorage.getItem(LS.FIRST_USE)) localStorage.setItem(LS.FIRST_USE, Date.now());
-
-  // Apply to model selector
-  const ms = $('model-selector');
-  if (ms) ms.value = STATE.activeModel;
-}
-
-function saveSettings() {
-  localStorage.setItem(LS.API_KEY,     STATE.apiKey);
-  localStorage.setItem(LS.BACKEND_URL, STATE.backendUrl);
-  localStorage.setItem(LS.VOICE_ON,    STATE.voiceOutputEnabled);
-  localStorage.setItem(LS.VOICE_RATE,  STATE.voiceRate);
-  localStorage.setItem(LS.VOICE_PITCH, STATE.voicePitch);
-  localStorage.setItem(LS.MODEL,       STATE.activeModel);
-  localStorage.setItem(LS.USERNAME,    STATE.userName);
-  localStorage.setItem(LS.STAY_IN,     STATE.stayLoggedIn);
-  if (STATE.selectedVoice)
-    localStorage.setItem(LS.VOICE_IDX, STATE.voices.indexOf(STATE.selectedVoice));
-}
-
-// ================================================================
-// SIDEBAR
-// ================================================================
-function initSidebar() {
-  document.querySelectorAll('.nav-item[data-panel]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      switchPanel(btn.dataset.panel);
-      // Close sidebar on mobile
-      if (window.innerWidth <= 768) $('sidebar').classList.remove('open');
-    });
-  });
-
-  $('sidebar-toggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
-
-  $('btn-logout').addEventListener('click', lockSession);
-}
-
-function switchPanel(panelId) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item[data-panel]').forEach(b => b.classList.remove('active'));
-  const panel = $(panelId);
-  if (panel) panel.classList.add('active');
-  const btn = document.querySelector(`.nav-item[data-panel="${panelId}"]`);
-  if (btn) btn.classList.add('active');
-
-  // Refresh status panel when opened
-  if (panelId === 'panel-status') refreshStatusPanel();
-  if (panelId === 'panel-memory') renderMemoryFeed();
-}
-
-// ================================================================
-// TOPBAR
-// ================================================================
-function initTopbar() {
-  updateGreeting();
-  updateDateDisplay();
-  setInterval(updateDateDisplay, 60000);
-  setInterval(updateGreeting, 3600000);
-
-  $('btn-voice-toggle').addEventListener('click', toggleVoiceOutput);
-  $('btn-briefing').addEventListener('click', openBriefing);
-  $('btn-settings').addEventListener('click', openSettings);
-  $('model-selector').addEventListener('change', e => {
-    STATE.activeModel = e.target.value;
-    saveSettings();
-    sysLog(`Model switched to ${STATE.activeModel}`, 'info');
-    showToast(`Model: ${STATE.activeModel}`, 'info');
-    updateStatusCard('sc-model', STATE.activeModel, '');
-  });
-}
-
-function updateGreeting() {
-  const h      = new Date().getHours();
-  const period = h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
-  $('topbar-greeting').textContent = `Good ${period}, ${STATE.userName}.`;
-}
-
-function updateDateDisplay() {
-  const now = new Date();
-  $('topbar-date').textContent = now.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-  });
-}
-
-// ================================================================
-// VOICE SYSTEM
-// ================================================================
-function initVoice() {
-  // Load voices
-  const loadVoices = () => {
-    STATE.voices = speechSynthesis.getVoices();
-    buildVoiceDropdown();
-    autoSelectVoice();
-    updateVoiceStatusCard();
-  };
-  if (speechSynthesis.getVoices().length) loadVoices();
-  speechSynthesis.onvoiceschanged = loadVoices;
-
-  // Update icon
-  updateVoiceIcon();
-}
-
-function buildVoiceDropdown() {
-  const sel = $('set-voice-select');
-  if (!sel) return;
-  sel.innerHTML = '';
-  STATE.voices.forEach((v, i) => {
-    const o = document.createElement('option');
-    o.value = i;
-    o.textContent = `${v.name} (${v.lang})`;
-    sel.appendChild(o);
-  });
-  const savedIdx = parseInt(localStorage.getItem(LS.VOICE_IDX));
-  if (!isNaN(savedIdx) && STATE.voices[savedIdx]) {
-    sel.value = savedIdx;
-    STATE.selectedVoice = STATE.voices[savedIdx];
-  }
-}
-
-function autoSelectVoice() {
-  if (STATE.selectedVoice) return;
-  const preferred = ['Google UK English Male','Google US English','Alex','Daniel','Fred','Samantha'];
-  for (const name of preferred) {
-    const v = STATE.voices.find(v => v.name.includes(name));
-    if (v) { STATE.selectedVoice = v; return; }
-  }
-  const eng = STATE.voices.find(v => /en/i.test(v.lang));
-  if (eng) STATE.selectedVoice = eng;
-  else if (STATE.voices[0]) STATE.selectedVoice = STATE.voices[0];
-}
-
-function speak(text) {
-  if (!STATE.voiceOutputEnabled) return;
-  if (!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-  let idx = 0;
-  const next = () => {
-    if (idx >= sentences.length) return;
-    const u = new SpeechSynthesisUtterance(sentences[idx].trim());
-    if (STATE.selectedVoice) u.voice = STATE.selectedVoice;
-    u.rate = STATE.voiceRate; u.pitch = STATE.voicePitch; u.volume = 1;
-    u.onend = () => { idx++; next(); };
-    speechSynthesis.speak(u);
-    idx++;
-  };
-  next();
-}
-
-function toggleVoiceOutput() {
-  STATE.voiceOutputEnabled = !STATE.voiceOutputEnabled;
-  updateVoiceIcon();
-  saveSettings();
-  showToast(STATE.voiceOutputEnabled ? 'Voice output enabled' : 'Voice output muted', 'info');
-  sysLog(`Voice output ${STATE.voiceOutputEnabled ? 'enabled' : 'disabled'}`, 'info');
-}
-
-function updateVoiceIcon() {
-  const btn = $('btn-voice-toggle');
-  if (!btn) return;
-  if (STATE.voiceOutputEnabled) {
-    btn.querySelector('svg').innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>';
-    btn.style.color = '';
-  } else {
-    btn.querySelector('svg').innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
-    btn.style.color = 'var(--text-faint)';
-  }
-}
-
-function updateVoiceStatusCard() {
-  const hasVoice = 'speechSynthesis' in window && STATE.voices.length > 0;
-  updateStatusCard('sc-voice',
-    hasVoice ? 'AVAILABLE' : 'UNAVAILABLE',
-    hasVoice ? `${STATE.voices.length} voices loaded` : 'Browser unsupported',
-    hasVoice ? 'online' : 'offline'
-  );
-  if (!hasVoice) sysLog('Speech synthesis not available in this browser.', 'warn');
-}
-
-// Voice Input
-function initRecognition() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return null;
-  const rec = new SR();
-  rec.continuous = false; rec.interimResults = false; rec.lang = 'en-US';
-  rec.onresult = e => {
-    const text = e.results[0][0].transcript.trim();
-    $('chat-input').value = text;
-    stopVoiceInput();
-    handleChatSend();
-  };
-  rec.onerror  = () => stopVoiceInput();
-  rec.onend    = () => { if (STATE.voiceInputActive) { try { rec.start(); } catch {} } };
-  return rec;
-}
-
-function startVoiceInput() {
-  if (!STATE.recognition) STATE.recognition = initRecognition();
-  if (!STATE.recognition) {
-    showToast('Voice input not supported in this browser. Use Chrome or Edge.', 'error');
-    sysLog('Voice input unavailable — browser unsupported.', 'warn');
-    return;
-  }
-  STATE.voiceInputActive = true;
-  $('mic-btn').classList.add('listening');
-  try { STATE.recognition.start(); } catch {}
-  sysLog('Voice input started.', 'info');
-}
-
-function stopVoiceInput() {
-  STATE.voiceInputActive = false;
-  $('mic-btn').classList.remove('listening');
-  if (STATE.recognition) { try { STATE.recognition.stop(); } catch {} }
-}
-
-// ================================================================
-// CHAT SYSTEM
-// ================================================================
-function initChat() {
-  // Load saved history
-  try {
-    const saved = JSON.parse(localStorage.getItem(LS.CHAT) || '[]');
-    STATE.chatHistory = Array.isArray(saved) ? saved : [];
-  } catch { STATE.chatHistory = []; }
-
-  renderChatHistory();
-
-  // Add welcome message if empty
-  if (STATE.chatHistory.length === 0) {
-    const h = new Date().getHours();
-    const period = h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
-    const greeting = `Good ${period}, ${STATE.userName}. ARIA is online. How can I assist you today?`;
-    appendChatMsg('aria', greeting, false);
-    speak(greeting);
-  }
-
-  // Event listeners
-  $('send-btn').addEventListener('click', handleChatSend);
-  $('chat-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend(); }
-  });
-  $('mic-btn').addEventListener('click', () => {
-    STATE.voiceInputActive ? stopVoiceInput() : startVoiceInput();
-  });
-  $('btn-clear-chat').addEventListener('click', clearChat);
-}
-
-function renderChatHistory() {
-  const feed = $('chat-feed');
-  if (!feed) return;
-  feed.innerHTML = '';
-  STATE.chatHistory.forEach(m => renderMsg(m.role, m.text, m.ts, false));
-  scrollChatBottom();
-}
-
-function appendChatMsg(role, text, save = true) {
-  const ts = Date.now();
-  if (save) {
-    STATE.chatHistory.push({ role, text, ts });
-    saveChatHistory();
-  }
-  renderMsg(role, text, ts, true);
-  return ts;
-}
-
-function renderMsg(role, text, ts, animate = true) {
-  const feed = $('chat-feed');
-  if (!feed) return;
-
-  const isAria = role === 'aria';
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  if (!animate) div.style.animation = 'none';
-
-  const timeStr = ts ? new Date(ts).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : '';
-
-  div.innerHTML = `
-    <div class="msg-avatar">${isAria ? 'AI' : 'YOU'}</div>
-    <div class="msg-body">
-      <div class="msg-sender">${isAria ? 'ARIA' : 'YOU'}</div>
-      <div class="msg-text">${escapeHtml(text)}</div>
-      <div class="msg-time">${timeStr}</div>
-    </div>
-  `;
-  feed.appendChild(div);
-  scrollChatBottom();
-  return div;
-}
-
-function showTypingIndicator() {
-  const feed = $('chat-feed');
-  const div = document.createElement('div');
-  div.className = 'msg aria';
-  div.id = 'typing-indicator';
-  div.innerHTML = `
-    <div class="msg-avatar">AI</div>
-    <div class="msg-body">
-      <div class="msg-sender">ARIA</div>
-      <div class="msg-text"><div class="typing-dots"><span></span><span></span><span></span></div></div>
-    </div>
-  `;
-  feed.appendChild(div);
-  scrollChatBottom();
-}
-
-function removeTypingIndicator() {
-  const el = $('typing-indicator');
-  if (el) el.remove();
-}
-
-function scrollChatBottom() {
-  requestAnimationFrame(() => {
-    const feed = $('chat-feed');
-    if (feed) feed.scrollTop = feed.scrollHeight;
-  });
-}
-
-function saveChatHistory() {
-  // Keep last 200 messages
-  if (STATE.chatHistory.length > 200) STATE.chatHistory = STATE.chatHistory.slice(-200);
-  localStorage.setItem(LS.CHAT, JSON.stringify(STATE.chatHistory));
-  updateMemoryStats();
-}
-
-function clearChat() {
-  STATE.chatHistory = [];
-  localStorage.removeItem(LS.CHAT);
-  $('chat-feed').innerHTML = '';
-  addSysMsgToChat('Chat history cleared.');
-  showToast('Chat cleared', 'info');
-  sysLog('Chat history cleared.', 'info');
-  updateMemoryStats();
-}
-
-function addSysMsgToChat(text) {
-  const feed = $('chat-feed');
-  const div = document.createElement('div');
-  div.className = 'sys-msg';
-  div.textContent = text;
-  feed.appendChild(div);
-  scrollChatBottom();
-}
-
-// ================================================================
-// HANDLE CHAT SEND (routes to commands or AI)
-// ================================================================
-async function handleChatSend() {
-  const raw = $('chat-input').value.trim();
-  if (!raw) return;
-  $('chat-input').value = '';
-
-  appendChatMsg('user', raw);
-
-  // 1. Try automation commands first
-  if (handleCommand(raw)) return;
-
-  // 2. Route to AI (or explain how to connect)
-  await handleAIReply(raw);
-}
-
-// ================================================================
-// COMMAND HANDLER
-// ================================================================
-const OPEN_MAP = {
-  'youtube':   'https://youtube.com',
-  'google':    'https://google.com',
-  'gmail':     'https://mail.google.com',
-  'github':    'https://github.com',
-  'reddit':    'https://reddit.com',
-  'spotify':   'https://open.spotify.com',
-  'netflix':   'https://netflix.com',
-  'twitter':   'https://x.com',
-  'x':         'https://x.com',
-  'instagram': 'https://instagram.com',
-  'amazon':    'https://amazon.com',
-  'wikipedia': 'https://wikipedia.org',
-  'chatgpt':   'https://chat.openai.com',
-};
-
-function handleCommand(input) {
-  const lower = input.toLowerCase().trim();
-
-  // ── Open website ──────────────────────────────────────
-  for (const [key, url] of Object.entries(OPEN_MAP)) {
-    if ([`open ${key}`, `go to ${key}`, `launch ${key}`].includes(lower)) {
-      window.open(url, '_blank');
-      const reply = `Opening ${capitalize(key)} now.`;
-      appendChatMsg('aria', reply);
-      speak(reply);
-      sysLog(`Opened ${key}`, 'ok');
-      return true;
-    }
-  }
-
-  // ── Search YouTube ────────────────────────────────────
-  const ytMatch = lower.match(/^(?:search youtube|youtube search)\s+(?:for\s+)?(.+)$/);
-  if (ytMatch) {
-    const q = ytMatch[1];
-    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, '_blank');
-    const reply = `Searching YouTube for "${q}".`;
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  // ── Search Google ─────────────────────────────────────
-  const gMatch = lower.match(/^(?:search google|google search|search for|search)\s+(.+)$/);
-  if (gMatch) {
-    const q = gMatch[1];
-    window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-    const reply = `Searching Google for "${q}".`;
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  // ── Date / Time ───────────────────────────────────────
-  if (/what(?:'?s| is)? (?:the )?(?:current )?time|what time is it/i.test(lower)) {
-    const t = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const reply = `The current time is ${t}.`;
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  if (/what(?:'?s| is)? (?:today'?s? )?date|show (?:today'?s )?date/i.test(lower)) {
-    const d = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-    const reply = `Today is ${d}.`;
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  // ── Clear chat ────────────────────────────────────────
-  if (/^(clear chat|clear history|reset chat)$/i.test(lower)) {
-    clearChat();
-    return true;
-  }
-
-  // ── Voice mode ────────────────────────────────────────
-  if (/start voice(?: mode)?/i.test(lower)) {
-    startVoiceInput();
-    const reply = 'Voice input activated. I\'m listening.';
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-  if (/stop voice(?: mode)?/i.test(lower)) {
-    stopVoiceInput();
-    const reply = 'Voice input deactivated.';
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  // ── Show memory ───────────────────────────────────────
-  if (/show memory|open memory/i.test(lower)) {
-    switchPanel('panel-memory');
-    const reply = 'Memory panel is now active.';
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  // ── System commands ───────────────────────────────────
-  if (/^(shutdown|restart|lock screen|sleep)$/i.test(lower)) {
-    const reply = 'System-level commands require a native desktop bridge. This feature is not available in the web version of ARIA.';
-    appendChatMsg('aria', reply);
-    speak(reply);
-    return true;
-  }
-
-  return false;
-}
-
-// ================================================================
-// AI REPLY — backend-ready structure
-// ================================================================
-async function handleAIReply(userMessage) {
-  showTypingIndicator();
-
-  try {
-    // ── If backend URL and API key are set → call real backend ──
-    if (STATE.backendUrl && STATE.apiKey) {
-      const response = await callBackend(userMessage);
-      removeTypingIndicator();
-      if (response) {
-        appendChatMsg('aria', response);
-        speak(response);
-        return;
-      }
-    }
-
-    // ── If only API key set → call OpenAI directly (CORS may block) ──
-    if (STATE.apiKey && !STATE.backendUrl) {
-      const response = await callOpenAIDirect(userMessage);
-      removeTypingIndicator();
-      if (response) {
-        appendChatMsg('aria', response);
-        speak(response);
-        return;
-      }
-    }
-
-    // ── No API key → friendly explanation ──
-    await sleep(800 + Math.random() * 400);
-    removeTypingIndicator();
-    const noKeyReply = `I don't have an API key configured yet, ${STATE.userName}. To enable real AI responses, open Settings and paste your OpenAI API key. You can also point me at a custom backend URL. Once that's set, I'll have full reasoning capability.`;
-    appendChatMsg('aria', noKeyReply);
-    speak(noKeyReply);
-
-  } catch (err) {
-    removeTypingIndicator();
-    const errReply = `I encountered an error connecting to the AI backend: ${err.message}. Please check your API key and backend URL in Settings.`;
-    appendChatMsg('aria', errReply);
-    sysLog(`AI error: ${err.message}`, 'err');
-  }
-}
-
-// ── Backend call (your own server.js or any REST API) ─────────
-async function callBackend(message) {
-  const res = await Promise.race([
-    fetch(`${STATE.backendUrl}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message,
-        model: STATE.activeModel,
-        history: STATE.chatHistory.slice(-10),
-      }),
-    }),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('Request timed out')), 20000)),
-  ]);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  return data.reply || data.message || data.content || null;
-}
-
-// ── Direct OpenAI call ─────────────────────────────────────────
-// NOTE: Works in browser only if CORS is allowed or a proxy is used.
-// Recommended approach: use server.js as the proxy.
-async function callOpenAIDirect(message) {
-  const model = STATE.activeModel.startsWith('gpt') ? STATE.activeModel : 'gpt-4o';
-
-  const messages = [
-    {
-      role: 'system',
-      content: `You are ARIA — a calm, intelligent, loyal AI assistant. Address the user as "${STATE.userName}" occasionally. Be direct, useful, and confident. Never be sycophantic. Keep responses concise unless depth is needed.`,
-    },
-    ...STATE.chatHistory.slice(-8).map(m => ({ role: m.role === 'aria' ? 'assistant' : 'user', content: m.text })),
-    { role: 'user', content: message },
-  ];
-
-  const res = await Promise.race([
-    fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${STATE.apiKey}`,
-      },
-      body: JSON.stringify({ model, messages, max_tokens: 500, temperature: 0.7 }),
-    }),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('OpenAI request timed out')), 20000)),
-  ]);
-
-  if (res.status === 401) throw new Error('Invalid API key. Check Settings.');
-  if (res.status === 429) throw new Error('Rate limit reached. Wait a moment.');
-  if (!res.ok) throw new Error(`OpenAI error: HTTP ${res.status}`);
-
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content?.trim() || null;
-}
-
-// ================================================================
-// COMMANDS PANEL
-// ================================================================
-function initCommands() {
-  // Quick-command buttons
-  document.querySelectorAll('.cmd-btn[data-cmd]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cmd = btn.dataset.cmd;
-      if (cmd.startsWith('sys-')) {
-        showToast('System commands require native desktop bridge.', 'error');
-        return;
-      }
-      // Route to chat panel and process
-      switchPanel('panel-chat');
-      $('chat-input').value = cmd;
-      handleChatSend();
-    });
-  });
-
-  // Search shortcuts
-  $('search-google-btn').addEventListener('click', () => {
-    const q = $('search-query').value.trim();
-    if (!q) { showToast('Enter a search query', 'error'); return; }
-    window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-    showToast(`Searching Google for "${q}"`, 'info');
-    $('search-query').value = '';
-  });
-
-  $('search-youtube-btn').addEventListener('click', () => {
-    const q = $('search-query').value.trim();
-    if (!q) { showToast('Enter a search query', 'error'); return; }
-    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`, '_blank');
-    showToast(`Searching YouTube for "${q}"`, 'info');
-    $('search-query').value = '';
-  });
-
-  $('search-query').addEventListener('keydown', e => {
-    if (e.key === 'Enter') $('search-google-btn').click();
-  });
-}
-
-// ================================================================
-// EXPENSE TRACKER
-// ================================================================
-let expenses = [];
-
-function initExpenses() {
-  // Load from localStorage
-  try {
-    expenses = JSON.parse(localStorage.getItem(LS.EXPENSES) || '[]');
-  } catch { expenses = []; }
-
-  // Set today's date as default
-  const dateEl = $('exp-date');
-  if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
-
-  renderExpenses();
-
-  $('btn-add-expense').addEventListener('click', addExpense);
-  $('btn-clear-expenses').addEventListener('click', clearExpenses);
-
-  // Enter key on amount
-  $('exp-amount').addEventListener('keydown', e => { if (e.key === 'Enter') addExpense(); });
-}
-
-function addExpense() {
-  const name   = $('exp-name').value.trim();
-  const amount = parseFloat($('exp-amount').value);
-  const cat    = $('exp-category').value;
-  const date   = $('exp-date').value || new Date().toISOString().slice(0, 10);
-
-  if (!name) { showToast('Enter a description', 'error'); return; }
-  if (isNaN(amount) || amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
-
-  const entry = { id: Date.now(), name, amount, cat, date };
-  expenses.unshift(entry);
-  saveExpenses();
-  renderExpenses();
-
-  $('exp-name').value   = '';
-  $('exp-amount').value = '';
-  showToast(`Added: $${amount.toFixed(2)} — ${name}`, 'success');
-  sysLog(`Expense added: ${name} $${amount.toFixed(2)}`, 'ok');
-}
-
-function deleteExpense(id) {
-  expenses = expenses.filter(e => e.id !== id);
-  saveExpenses();
-  renderExpenses();
-  showToast('Expense removed', 'info');
-}
-
-function clearExpenses() {
-  if (!confirm('Clear all expense entries?')) return;
-  expenses = [];
-  saveExpenses();
-  renderExpenses();
-  showToast('All expenses cleared', 'info');
-}
-
-function saveExpenses() {
-  localStorage.setItem(LS.EXPENSES, JSON.stringify(expenses));
-}
-
-function renderExpenses() {
-  const list  = $('expense-list');
-  const total = expenses.reduce((a, e) => a + e.amount, 0);
-
-  // Month total
-  const now = new Date();
-  const monthTotal = expenses
-    .filter(e => { const d = new Date(e.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); })
-    .reduce((a, e) => a + e.amount, 0);
-
-  $('exp-total').textContent  = `$${total.toFixed(2)}`;
-  $('exp-month').textContent  = `$${monthTotal.toFixed(2)}`;
-  $('exp-count').textContent  = expenses.length;
-
-  if (!list) return;
-  if (expenses.length === 0) {
-    list.innerHTML = '<div class="exp-empty">No expenses recorded yet.</div>';
-    return;
-  }
-
-  list.innerHTML = '';
-  expenses.forEach(e => {
-    const div = document.createElement('div');
-    div.className = 'exp-item';
-    div.innerHTML = `
-      <span class="exp-item-cat">${escapeHtml(e.cat)}</span>
-      <span class="exp-item-name">${escapeHtml(e.name)}</span>
-      <span class="exp-item-date">${e.date}</span>
-      <span class="exp-item-amount">$${e.amount.toFixed(2)}</span>
-      <button class="exp-item-del" data-id="${e.id}" title="Delete">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
-      </button>
-    `;
-    list.appendChild(div);
-  });
-
-  list.querySelectorAll('.exp-item-del').forEach(btn => {
-    btn.addEventListener('click', () => deleteExpense(parseInt(btn.dataset.id)));
-  });
-}
-
-// ================================================================
-// MEMORY / HISTORY PANEL
-// ================================================================
-function initMemory() {
-  $('btn-clear-memory').addEventListener('click', () => {
-    if (!confirm('Clear all ARIA memory and chat history?')) return;
-    clearChat();
-    showToast('Memory cleared', 'info');
-  });
-
-  updateMemoryStats();
-  renderMemoryFeed();
-}
-
-function updateMemoryStats() {
-  $('mem-msg-count').textContent = STATE.chatHistory.length;
-
-  const firstUse = parseInt(localStorage.getItem(LS.FIRST_USE) || Date.now());
-  const days = Math.max(1, Math.round((Date.now() - firstUse) / 86400000));
-  $('mem-days').textContent = days;
-}
-
-function renderMemoryFeed() {
-  const feed = $('memory-feed');
-  if (!feed) return;
-
-  updateMemoryStats();
-
-  if (STATE.chatHistory.length === 0) {
-    feed.innerHTML = '<div class="mem-empty">No memory entries yet. Start chatting.</div>';
-    return;
-  }
-
-  feed.innerHTML = '';
-  // Show last 50 entries, newest first
-  const slice = [...STATE.chatHistory].reverse().slice(0, 50);
-  slice.forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'mem-entry';
-    const ts = m.ts ? new Date(m.ts).toLocaleString() : '—';
-    div.innerHTML = `
-      <div class="mem-entry-meta">${m.role.toUpperCase()} · ${ts}</div>
-      <div class="mem-entry-text">${escapeHtml(m.text.slice(0, 200))}${m.text.length > 200 ? '…' : ''}</div>
-    `;
-    feed.appendChild(div);
-  });
-}
-
-// ================================================================
-// STATUS PANEL
-// ================================================================
-function initStatus() {
-  $('btn-refresh-status').addEventListener('click', () => {
-    refreshStatusPanel();
-    showToast('Status refreshed', 'info');
-  });
-  refreshStatusPanel();
-}
-
-function refreshStatusPanel() {
-  updateStatusCard('sc-backend',
-    STATE.backendOnline ? 'CONNECTED' : (STATE.backendUrl ? 'OFFLINE' : 'NOT SET'),
-    STATE.backendUrl || 'Configure in Settings',
-    STATE.backendOnline ? 'online' : 'offline'
-  );
-  updateStatusCard('sc-model', STATE.activeModel, 'Change in Chat panel', '');
-  updateStatusCard('sc-apikey',
-    STATE.apiKey ? 'CONFIGURED' : 'NOT SET',
-    STATE.apiKey ? `Key: sk-…${STATE.apiKey.slice(-4)}` : 'Set in Settings',
-    STATE.apiKey ? 'online' : ''
-  );
-  updateStatusCard('sc-memory-sub', null, `${STATE.chatHistory.length} messages stored`);
-  updateVoiceStatusCard();
-}
-
-async function checkBackendStatus() {
-  if (!STATE.backendUrl) {
-    sysLog('No backend URL configured.', 'warn');
-    return;
-  }
-  sysLog(`Checking backend at ${STATE.backendUrl}…`, 'info');
-  try {
-    const res = await Promise.race([
-      fetch(`${STATE.backendUrl}/api/health`),
-      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000)),
-    ]);
-    STATE.backendOnline = res.ok;
-    sysLog(`Backend ${res.ok ? 'online' : 'returned error ' + res.status}`, res.ok ? 'ok' : 'err');
-    refreshStatusPanel();
-  } catch {
-    STATE.backendOnline = false;
-    sysLog('Backend unreachable.', 'err');
-    refreshStatusPanel();
-  }
-}
-
-function updateStatusCard(id, val, sub, cls) {
-  const el = $(id);
-  if (!el) return;
-  if (val !== null && val !== undefined) {
-    el.textContent = val;
-    el.className = `status-card-val${cls ? ' ' + cls : ''}`;
-  }
-  const subEl = $(`${id}-sub`);
-  if (subEl && sub !== null && sub !== undefined) subEl.textContent = sub;
-}
-
-function sysLog(msg, type = 'info') {
-  const ts = new Date().toLocaleTimeString();
-  STATE.systemLog.unshift({ msg, type, ts });
-  if (STATE.systemLog.length > 100) STATE.systemLog.pop();
-
-  const log = $('system-log');
-  if (!log) return;
-  const line = document.createElement('div');
-  line.className = `log-line ${type}`;
-  line.textContent = `[${ts}] ${msg}`;
-  log.insertBefore(line, log.firstChild);
-  if (log.children.length > 60) log.removeChild(log.lastChild);
-}
-
-// ================================================================
-// SETTINGS MODAL
-// ================================================================
-function initSettingsModal() {
-  $('btn-settings').addEventListener('click', openSettings);
-  $('modal-settings-close').addEventListener('click', closeSettings);
-  $('modal-settings-cancel').addEventListener('click', closeSettings);
-  $('modal-settings-save').addEventListener('click', saveSettingsModal);
-  $('modal-settings').addEventListener('click', e => { if (e.target === $('modal-settings')) closeSettings(); });
-
-  // Show/hide API key
-  $('toggle-apikey-vis').addEventListener('click', () => {
-    const inp = $('set-apikey');
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-  });
-
-  // Rate/pitch sliders
-  $('set-voice-rate').addEventListener('input', () => {
-    $('rate-badge').textContent = parseFloat($('set-voice-rate').value).toFixed(2);
-  });
-  $('set-voice-pitch').addEventListener('input', () => {
-    $('pitch-badge').textContent = parseFloat($('set-voice-pitch').value).toFixed(2);
-  });
-
-  // Test voice
-  $('btn-test-voice').addEventListener('click', () => {
-    const rate  = parseFloat($('set-voice-rate').value);
-    const pitch = parseFloat($('set-voice-pitch').value);
-    const voiceIdx = parseInt($('set-voice-select').value);
-    const tmpVoice  = STATE.voices[voiceIdx] || STATE.selectedVoice;
-    const u = new SpeechSynthesisUtterance(`ARIA voice test. Rate ${rate.toFixed(2)}, pitch ${pitch.toFixed(2)}. Systems nominal.`);
-    if (tmpVoice) u.voice = tmpVoice;
-    u.rate = rate; u.pitch = pitch;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  });
-
-  // PIN change
-  $('btn-change-pin').addEventListener('click', changePin);
-}
-
-function openSettings() {
-  // Populate form with current state
-  $('set-apikey').value       = STATE.apiKey;
-  $('set-backend-url').value  = STATE.backendUrl;
-  $('set-voice-output').checked = STATE.voiceOutputEnabled;
-  $('set-voice-rate').value   = STATE.voiceRate;
-  $('set-voice-pitch').value  = STATE.voicePitch;
-  $('rate-badge').textContent  = STATE.voiceRate.toFixed(2);
-  $('pitch-badge').textContent = STATE.voicePitch.toFixed(2);
-  $('set-stay-logged-in').checked = STATE.stayLoggedIn;
-  $('set-username').value     = STATE.userName;
-  $('modal-settings').classList.remove('hidden');
-  $('pin-change-msg').classList.add('hidden');
-}
-
-function closeSettings() {
-  $('modal-settings').classList.add('hidden');
-}
-
-function saveSettingsModal() {
-  STATE.apiKey         = $('set-apikey').value.trim();
-  STATE.backendUrl     = $('set-backend-url').value.trim().replace(/\/$/, '');
-  STATE.voiceOutputEnabled = $('set-voice-output').checked;
-  STATE.voiceRate      = parseFloat($('set-voice-rate').value);
-  STATE.voicePitch     = parseFloat($('set-voice-pitch').value);
-  STATE.stayLoggedIn   = $('set-stay-logged-in').checked;
-  STATE.userName       = $('set-username').value.trim() || CONFIG.USER_NAME;
-
-  const voiceIdx = parseInt($('set-voice-select').value);
-  if (!isNaN(voiceIdx) && STATE.voices[voiceIdx]) {
-    STATE.selectedVoice = STATE.voices[voiceIdx];
-  }
-
-  saveSettings();
-  updateGreeting();
-  updateVoiceIcon();
-  refreshStatusPanel();
-  closeSettings();
-  showToast('Settings saved', 'success');
-  sysLog('Settings updated.', 'ok');
-
-  // Re-check backend if URL was set
-  if (STATE.backendUrl) checkBackendStatus();
-}
-
-function changePin() {
-  const current = $('set-pin-current').value.trim();
-  const newPin  = $('set-pin-new').value.trim();
-  const stored  = localStorage.getItem(LS.PIN) || CONFIG.DEFAULT_PIN;
-  const msgEl   = $('pin-change-msg');
-
-  msgEl.classList.remove('hidden', 'ok', 'err');
-
-  if (current !== stored) {
-    msgEl.textContent = '✗ Current PIN is incorrect.';
-    msgEl.classList.add('err');
-    return;
-  }
-  if (!/^\d{4}$/.test(newPin)) {
-    msgEl.textContent = '✗ New PIN must be exactly 4 digits.';
-    msgEl.classList.add('err');
-    return;
-  }
-
-  localStorage.setItem(LS.PIN, newPin);
-  $('set-pin-current').value = '';
-  $('set-pin-new').value = '';
-  msgEl.textContent = '✓ PIN changed successfully.';
-  msgEl.classList.add('ok');
-  sysLog('Access PIN updated.', 'ok');
-}
-
-// ================================================================
-// DAILY BRIEFING MODAL
-// ================================================================
-function initBriefingModal() {
-  $('modal-briefing-close').addEventListener('click', () => $('modal-briefing').classList.add('hidden'));
-  $('modal-briefing').addEventListener('click', e => { if (e.target === $('modal-briefing')) $('modal-briefing').classList.add('hidden'); });
-}
-
-function openBriefing() {
-  const now  = new Date();
-  const body = $('briefing-body');
-
-  // Build briefing content
-  // In a real deployment, this would call a news/weather API.
-  // Here we show a structured demo briefing.
-  const hour   = now.getHours();
-  const period = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
-
-  body.innerHTML = `
-    <div style="font-family:var(--font-m);font-size:11px;color:var(--red);letter-spacing:2px;margin-bottom:16px">
-      BRIEFING GENERATED — ${now.toLocaleString()}
-    </div>
-
-    <div class="briefing-section">
-      <div class="briefing-section-title">Overview</div>
-      <div class="briefing-item">
-        <div class="briefing-item-title">Good ${period}, ${STATE.userName}.</div>
-        <div class="briefing-item-meta">ARIA Personal Intelligence System · Web Edition</div>
-      </div>
-    </div>
-
-    <div class="briefing-section">
-      <div class="briefing-section-title">System Status</div>
-      <div class="briefing-item">
-        <div class="briefing-item-title">ARIA Core — Online</div>
-        <div class="briefing-item-meta">Chat history: ${STATE.chatHistory.length} messages · Model: ${STATE.activeModel}</div>
-      </div>
-      <div class="briefing-item">
-        <div class="briefing-item-title">API Connection — ${STATE.apiKey ? 'Key configured' : 'Not configured'}</div>
-        <div class="briefing-item-meta">${STATE.apiKey ? 'Real AI responses available' : 'Add API key in Settings to enable AI chat'}</div>
-      </div>
-      <div class="briefing-item">
-        <div class="briefing-item-title">Expenses — ${expenses.length} entries tracked</div>
-        <div class="briefing-item-meta">Total: $${expenses.reduce((a,e)=>a+e.amount,0).toFixed(2)}</div>
-      </div>
-    </div>
-
-    <div class="briefing-section">
-      <div class="briefing-section-title">Quick Commands</div>
-      <div class="briefing-item">
-        <div class="briefing-item-title">Type in chat to control ARIA</div>
-        <div class="briefing-item-meta">"open YouTube" · "search Google for X" · "what time is it" · "start voice mode"</div>
-      </div>
-    </div>
-
-    <div class="briefing-section">
-      <div class="briefing-section-title">Connect Live Data <span style="color:var(--text-faint);font-size:9px">(backend required)</span></div>
-      <div class="briefing-item">
-        <div class="briefing-item-title">News, Weather, Calendar</div>
-        <div class="briefing-item-meta">Deploy server.js with your API keys to enable live briefing data.</div>
-      </div>
-    </div>
-  `;
-
-  $('modal-briefing').classList.remove('hidden');
-  speak(`Daily briefing ready, ${STATE.userName}. ARIA systems are operational.`);
-}
-
-// ================================================================
-// TOAST NOTIFICATIONS
-// ================================================================
-function showToast(message, type = 'info', duration = 3000) {
-  const container = $('toast-container');
-  const toast     = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.animation = 'toastOut .3s ease forwards';
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-}
-
-// ================================================================
-// SESSION LOCK
-// ================================================================
-function lockSession() {
-  STATE.authenticated = false;
-  localStorage.removeItem(LS.AUTH);
-  speechSynthesis.cancel();
-  stopVoiceInput();
-
-  const dash = $('screen-dashboard');
-  dash.style.display = 'none';
-  dash.classList.remove('active');
-
-  // Reset connect lines
-  ['cl-0','cl-1','cl-2','cl-3'].forEach(id => {
-    const el = $(id);
-    if (el) {
-      el.className = 'connect-line';
-      el.querySelector('.cline-dot').className = 'cline-dot pending';
-    }
-  });
-
-  STATE.pinBuffer = '';
-  updatePinDisplay();
-  $('pin-error').classList.add('hidden');
-
-  switchScreen('screen-dashboard', 'screen-access');
-  showToast('Session locked', 'info');
-}
-
-// ================================================================
-// UTILITIES
-// ================================================================
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-function escapeHtml(text) {
-  return String(text)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-// ================================================================
+// -----------------------------------------------
+// STATE
+// -----------------------------------------------
+let repairs = [];
+let activeCategory = 'all';
+let editingId = null;
+
+// -----------------------------------------------
 // INIT
-// ================================================================
+// -----------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  initPinPad();
-  runBoot();
+  initData();
+  buildQuickGrid();
+  attachSearchListeners();
+  renderAdminList();
+  updateAdminCount();
 });
+
+// -----------------------------------------------
+// VIEW SWITCHING
+// -----------------------------------------------
+function showView(view) {
+  document.getElementById('viewLookup').style.display = view === 'lookup' ? '' : 'none';
+  document.getElementById('viewAdmin').style.display  = view === 'admin'  ? '' : 'none';
+  document.getElementById('navLookup').classList.toggle('active', view === 'lookup');
+  document.getElementById('navAdmin').classList.toggle('active', view === 'admin');
+  if (view === 'admin') { renderAdminList(); updateAdminCount(); }
+}
+
+// -----------------------------------------------
+// QUICK GRID
+// -----------------------------------------------
+function buildQuickGrid() {
+  const grid = document.getElementById('quickGrid');
+  grid.innerHTML = QUICK_REPAIRS.map(q => `
+    <button class="quick-chip" onclick="quickSearch('${q.searchFor}')">
+      <span class="quick-chip-icon">${q.icon}</span>${q.label}
+    </button>
+  `).join('');
+}
+
+function quickSearch(term) {
+  document.getElementById('searchInput').value = term;
+  activeCategory = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
+  runSearch(term);
+  document.getElementById('searchInput').focus();
+}
+
+// -----------------------------------------------
+// SEARCH
+// -----------------------------------------------
+function attachSearchListeners() {
+  const input   = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
+
+  input.addEventListener('input', () => {
+    const val = input.value;
+    clearBtn.style.display = val ? 'block' : 'none';
+    runSearch(val);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    clearBtn.style.display = 'none';
+    showHomepage();
+    input.focus();
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat;
+      runSearch(document.getElementById('searchInput').value);
+    });
+  });
+}
+
+function normalize(str) {
+  return (str || '').toLowerCase()
+    .replace(/\s+/g, ' ')
+    .replace(/[^a-z0-9 ]/g, '')
+    .trim();
+}
+
+// Map common shorthands so they always expand correctly
+const ALIASES = [
+  [/\b(\d{2})\s*pm\b/g,      '$1 pro max'],
+  [/\b(\d{2})\s*p\b/g,       '$1 pro'],
+  [/\b(\d{2})[+]\b/g,        '$1 plus'],
+  [/\biphone\s*/g,            'iphone '],
+  [/\bsamsung\s*/g,           'samsung '],
+  [/\bgalaxy\s*/g,            'samsung '],
+  [/\bmoto\s*/g,              'motorola '],
+  [/\bpixel\s*/g,             'pixel '],
+];
+
+function expandAliases(q) {
+  let s = q.toLowerCase();
+  ALIASES.forEach(([re, rep]) => { s = s.replace(re, rep); });
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+function matchScore(entry, query) {
+  if (!query) return 0;
+  const q        = normalize(expandAliases(query));
+  const model    = normalize(entry.model);
+  const brand    = normalize(entry.brand);
+  const type     = normalize(entry.repairType);
+  const combined = `${brand} ${model} ${type}`;
+  const keywords = (entry.keywords || []).map(normalize);
+
+  if (combined === q) return 100;
+  if (combined.includes(q)) return 80;
+  if (model.includes(q)) return 75;
+  if (keywords.some(k => k === q)) return 90;
+  if (keywords.some(k => k.includes(q))) return 70;
+
+  // token matching — every word in query must appear
+  const tokens = q.split(' ').filter(Boolean);
+  const allMatch = tokens.every(t => combined.includes(t) || keywords.some(k => k.includes(t)));
+  if (allMatch) return 60;
+
+  // partial match — at least half
+  const partial = tokens.filter(t => combined.includes(t) || keywords.some(k => k.includes(t)));
+  if (partial.length >= Math.ceil(tokens.length / 2)) return 30;
+
+  return 0;
+}
+
+function getRepairCategory(entry) {
+  const type = (entry.repairType || '').toLowerCase();
+  const brand = (entry.brand || '').toLowerCase();
+  if (type === 'lcd') return entry.brand; // iPhone / Samsung / Motorola / Google Pixel / iPad
+  if (type === 'battery') return 'Battery';
+  if (type === 'charging port') return 'Charging Port';
+  if (type === 'camera') return 'Camera';
+  return 'Other';
+}
+
+function runSearch(query) {
+  const q = query.trim();
+  if (!q && activeCategory === 'all') { showHomepage(); return; }
+
+  document.getElementById('mostUsed').style.display = 'none';
+  document.getElementById('resultsSection').style.display = '';
+
+  let results = repairs.map(entry => ({ entry, score: matchScore(entry, q) }));
+
+  // Category filter
+  if (activeCategory !== 'all') {
+    results = results.filter(({ entry }) => {
+      const cat = getRepairCategory(entry);
+      if (activeCategory === 'Other') {
+        return !['iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera'].includes(cat);
+      }
+      return cat === activeCategory;
+    });
+    // If no query, show all in category
+    if (!q) results.forEach(r => r.score = 1);
+  }
+
+  results = results.filter(r => r.score > 0).sort((a,b) => b.score - a.score);
+
+  const grid = document.getElementById('resultsGrid');
+  const meta = document.getElementById('resultsMeta');
+
+  if (results.length === 0) {
+    document.getElementById('resultsSection').style.display = 'none';
+    document.getElementById('noResults').style.display = '';
+  } else {
+    document.getElementById('noResults').style.display = 'none';
+    meta.textContent = `${results.length} result${results.length !== 1 ? 's' : ''} found`;
+    grid.innerHTML = results.map(r => renderCard(r.entry)).join('');
+  }
+}
+
+function showHomepage() {
+  document.getElementById('mostUsed').style.display = '';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('noResults').style.display = 'none';
+}
+
+// -----------------------------------------------
+// RENDER CARD
+// -----------------------------------------------
+function typeClass(repairType) {
+  const t = (repairType || '').toLowerCase();
+  if (t === 'lcd') return 'type-lcd';
+  if (t === 'battery') return 'type-battery';
+  if (t === 'charging port') return 'type-charging';
+  if (t === 'camera') return 'type-camera';
+  return 'type-other';
+}
+
+function fmt(val) {
+  if (val == null || val === '' || val === 0) return null;
+  return '$' + Number(val).toLocaleString();
+}
+
+function renderCard(entry) {
+  const isLCD  = entry.repairType === 'LCD';
+  const npStr  = fmt(entry.nonProfit);
+  const minStr = fmt(entry.minimum);
+  const maxStr = fmt(entry.maximum);
+
+  let pillsHTML = '';
+  if (isLCD && npStr) {
+    pillsHTML += `<div class="price-pill pill-np"><div class="price-pill-label">Non-Profit</div><div class="price-pill-value">${npStr}</div></div>`;
+  }
+  if (minStr) {
+    pillsHTML += `<div class="price-pill pill-min"><div class="price-pill-label">Minimum</div><div class="price-pill-value">${minStr}</div></div>`;
+  }
+  if (maxStr) {
+    pillsHTML += `<div class="price-pill pill-max"><div class="price-pill-label">Maximum</div><div class="price-pill-value">${maxStr}</div></div>`;
+  }
+
+  const variableNote = (!maxStr && minStr) ? '<p class="price-variable">Max price varies — quote based on model.</p>' : '';
+
+  return `
+    <div class="price-card">
+      <div class="card-brand">${entry.brand}</div>
+      <div class="card-model">${entry.model}</div>
+      <span class="card-type ${typeClass(entry.repairType)}">${entry.repairType}</span>
+      <div class="card-prices">${pillsHTML}</div>
+      ${variableNote}
+    </div>`;
+}
+
+// -----------------------------------------------
+// ADMIN — FORM
+// -----------------------------------------------
+function handleRepairTypeChange() {
+  const type = document.getElementById('fRepairType').value;
+  const npGroup = document.getElementById('npGroup');
+  const npInput = document.getElementById('fNonProfit');
+  if (type === 'LCD') {
+    npGroup.style.display = '';
+  } else {
+    npGroup.style.display = 'none';
+    npInput.value = '';
+  }
+}
+
+function genId() {
+  return 'u' + Date.now() + Math.random().toString(36).slice(2,6);
+}
+
+function saveEntry() {
+  const brand      = document.getElementById('fBrand').value.trim();
+  const model      = document.getElementById('fModel').value.trim();
+  const repairType = document.getElementById('fRepairType').value.trim();
+  const nonProfit  = document.getElementById('fNonProfit').value;
+  const minimum    = document.getElementById('fMin').value;
+  const maximum    = document.getElementById('fMax').value;
+  const kwRaw      = document.getElementById('fKeywords').value;
+  const errEl      = document.getElementById('formError');
+
+  errEl.textContent = '';
+  if (!brand || !model || !repairType) { errEl.textContent = 'Brand, Model, and Repair Type are required.'; return; }
+  if (!minimum) { errEl.textContent = 'Minimum Price is required.'; return; }
+
+  const keywords = kwRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+  const entry = {
+    id: editingId || genId(),
+    brand, model, repairType,
+    nonProfit: repairType === 'LCD' && nonProfit ? parseFloat(nonProfit) : null,
+    minimum: parseFloat(minimum),
+    maximum: maximum ? parseFloat(maximum) : null,
+    keywords,
+  };
+
+  if (editingId) {
+    const idx = repairs.findIndex(r => r.id === editingId);
+    if (idx !== -1) repairs[idx] = entry;
+  } else {
+    repairs.push(entry);
+  }
+
+  saveData(repairs);
+  resetForm();
+  renderAdminList();
+  updateAdminCount();
+  toast(editingId ? '✅ Repair updated!' : '✅ New repair added!');
+  editingId = null;
+}
+
+function resetForm() {
+  ['fBrand','fModel','fRepairType','fNonProfit','fMin','fMax','fKeywords'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+  });
+  document.getElementById('npGroup').style.display = 'none';
+  document.getElementById('formTitle').textContent = '➕ Add New Repair';
+  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('formError').textContent = '';
+  editingId = null;
+}
+
+function cancelEdit() { resetForm(); }
+
+function editEntry(id) {
+  const entry = repairs.find(r => r.id === id);
+  if (!entry) return;
+  editingId = id;
+
+  document.getElementById('fBrand').value      = entry.brand || '';
+  document.getElementById('fModel').value      = entry.model || '';
+  document.getElementById('fRepairType').value = entry.repairType || '';
+  document.getElementById('fNonProfit').value  = entry.nonProfit || '';
+  document.getElementById('fMin').value        = entry.minimum || '';
+  document.getElementById('fMax').value        = entry.maximum || '';
+  document.getElementById('fKeywords').value   = (entry.keywords || []).join(', ');
+
+  handleRepairTypeChange();
+  document.getElementById('formTitle').textContent = '✏️ Edit Repair';
+  document.getElementById('cancelEditBtn').style.display = '';
+  document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function deleteEntry(id) {
+  const entry = repairs.find(r => r.id === id);
+  if (!entry) return;
+  if (!confirm(`Delete "${entry.model} — ${entry.repairType}"?\n\nThis cannot be undone.`)) return;
+  repairs = repairs.filter(r => r.id !== id);
+  saveData(repairs);
+  renderAdminList();
+  updateAdminCount();
+  toast('🗑️ Entry deleted.');
+}
+
+// -----------------------------------------------
+// ADMIN LIST
+// -----------------------------------------------
+function renderAdminList() {
+  const q      = normalize(document.getElementById('adminSearch').value);
+  const list   = document.getElementById('adminList');
+  const filtered = q
+    ? repairs.filter(r => normalize(r.brand + ' ' + r.model + ' ' + r.repairType).includes(q))
+    : repairs;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<p style="color:var(--gray-500);font-size:14px;padding:20px 0;">No entries match.</p>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(entry => {
+    const npStr  = entry.repairType === 'LCD' && entry.nonProfit ? `<span class="admin-price-tag tag-np">NP $${entry.nonProfit}</span>` : '';
+    const minStr = entry.minimum  ? `<span class="admin-price-tag tag-min">Min $${entry.minimum}</span>`  : '';
+    const maxStr = entry.maximum  ? `<span class="admin-price-tag tag-max">Max $${entry.maximum}</span>`  : '';
+    return `
+      <div class="admin-row">
+        <div class="admin-row-info">
+          <div class="admin-row-brand">${entry.brand}</div>
+          <div class="admin-row-model">${entry.model}</div>
+          <div class="admin-row-meta">${entry.repairType}</div>
+        </div>
+        <div class="admin-row-prices">${npStr}${minStr}${maxStr}</div>
+        <div class="admin-row-btns">
+          <button class="btn-edit" onclick="editEntry('${entry.id}')">✏️ Edit</button>
+          <button class="btn-delete" onclick="deleteEntry('${entry.id}')">🗑️ Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateAdminCount() {
+  document.getElementById('adminCount').textContent = repairs.length;
+}
+
+// -----------------------------------------------
+// EXPORT / IMPORT
+// -----------------------------------------------
+function exportData() {
+  const json = JSON.stringify(repairs, null, 2);
+  const blob = new Blob([json], { type:'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'techy-repair-prices-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📥 Backup downloaded!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!Array.isArray(parsed)) throw new Error('Invalid format');
+      if (!confirm(`Import ${parsed.length} entries?\n\nThis will REPLACE your current price list.`)) return;
+      repairs = parsed;
+      saveData(repairs);
+      renderAdminList();
+      updateAdminCount();
+      toast(`✅ Imported ${parsed.length} entries!`);
+    } catch(err) {
+      alert('Import failed — invalid JSON file. Please use a backup exported from this tool.');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// -----------------------------------------------
+// TOAST
+// -----------------------------------------------
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
