@@ -216,8 +216,9 @@ const QUICK_REPAIRS = [
 // -----------------------------------------------
 // STORAGE
 // -----------------------------------------------
-const LS_KEY     = 'repairPriceData_v2';
-const LS_CAT_KEY = 'repairCustomCategories';
+const LS_KEY         = 'repairPriceData_v2';
+const LS_CAT_KEY     = 'repairCustomCategories';
+const LS_IPAD_CAT_KEY = 'repairIpadCustomCategories';
 
 function loadData() {
   try {
@@ -240,11 +241,21 @@ function loadCustomCategories() {
 }
 function saveCustomCategories(cats) { localStorage.setItem(LS_CAT_KEY, JSON.stringify(cats)); }
 
+function loadIpadCustomCategories() {
+  try {
+    const raw = localStorage.getItem(LS_IPAD_CAT_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return [];
+}
+function saveIpadCustomCategories(cats) { localStorage.setItem(LS_IPAD_CAT_KEY, JSON.stringify(cats)); }
+
 function initData() {
   const stored = loadData();
   repairs = stored || JSON.parse(JSON.stringify(DEFAULT_DATA));
   if (!stored) saveData(repairs);
-  customCategories = loadCustomCategories();
+  customCategories     = loadCustomCategories();
+  ipadCustomCategories = loadIpadCustomCategories();
 }
 
 // -----------------------------------------------
@@ -252,7 +263,9 @@ function initData() {
 // -----------------------------------------------
 let repairs = [];
 let customCategories = [];
+let ipadCustomCategories = [];
 let activeCategory = 'all';
+let activeIpadSubCategory = 'all';
 let editingId = null;
 
 // -----------------------------------------------
@@ -263,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildQuickGrid();
   attachSearchListeners();
   renderDynamicFilters();
+  renderDynamicIpadFilters();
   populateBrandSelect();
   renderAdminList();
   updateAdminCount();
@@ -312,7 +326,30 @@ function setFilter(btn, cat) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   activeCategory = cat;
+  const subStrip = document.getElementById('ipadSubfilters');
+  if (cat === 'iPad') {
+    subStrip.style.display = '';
+    activeIpadSubCategory = 'all';
+    document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.icat === 'all'));
+  } else {
+    subStrip.style.display = 'none';
+    activeIpadSubCategory = 'all';
+  }
   runSearch(document.getElementById('searchInput').value);
+}
+
+function setIpadSubFilter(btn, icat) {
+  document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeIpadSubCategory = icat;
+  runSearch(document.getElementById('searchInput').value);
+}
+
+function renderDynamicIpadFilters() {
+  const span = document.getElementById('dynamicIpadFilters');
+  span.innerHTML = ipadCustomCategories.map(cat => `
+    <button class="ipad-sub-btn" data-icat="${cat}" onclick="setIpadSubFilter(this,'${cat}')">${cat}</button>
+  `).join('');
 }
 
 // -----------------------------------------------
@@ -339,8 +376,23 @@ function attachSearchListeners() {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeCategory = btn.dataset.cat;
+      // Show iPad sub-filter strip only when iPad is selected
+      const subStrip = document.getElementById('ipadSubfilters');
+      if (activeCategory === 'iPad') {
+        subStrip.style.display = '';
+        activeIpadSubCategory = 'all';
+        document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.icat === 'all'));
+      } else {
+        subStrip.style.display = 'none';
+        activeIpadSubCategory = 'all';
+      }
       runSearch(input.value);
     });
+  });
+
+  // iPad sub-filter buttons (static ones wired here; dynamic ones use setIpadSubFilter)
+  document.querySelectorAll('.ipad-sub-btn').forEach(btn => {
+    btn.addEventListener('click', () => setIpadSubFilter(btn, btn.dataset.icat));
   });
 }
 
@@ -410,6 +462,7 @@ function runSearch(query) {
 
   let results = repairs.map(entry => ({ entry, score: matchScore(entry, q) }));
 
+  // Main category filter
   if (activeCategory !== 'all') {
     results = results.filter(({ entry }) => {
       const cat = getRepairCategory(entry);
@@ -419,6 +472,13 @@ function runSearch(query) {
       return cat === activeCategory;
     });
     if (!q) results.forEach(r => r.score = 1);
+  }
+
+  // iPad sub-category filter (only active when category is iPad)
+  if (activeCategory === 'iPad' && activeIpadSubCategory !== 'all') {
+    results = results.filter(({ entry }) =>
+      (entry.repairType || '').toLowerCase() === activeIpadSubCategory.toLowerCase()
+    );
   }
 
   results = results.filter(r => r.score > 0).sort((a,b) => b.score - a.score);
@@ -643,6 +703,9 @@ function updateAdminCount() {
 function openAddCategoryModal() {
   document.getElementById('catName').value = '';
   document.getElementById('catError').textContent = '';
+  // Reset to global scope
+  document.querySelector('input[name="catScope"][value="global"]').checked = true;
+  updateCatScopeHint();
   document.getElementById('catModal').classList.add('open');
   setTimeout(() => document.getElementById('catName').focus(), 100);
 }
@@ -651,6 +714,17 @@ function closeCatModal() {
 }
 function closeCatModalOutside(e) {
   if (e.target === document.getElementById('catModal')) closeCatModal();
+}
+function updateCatScopeHint() {
+  const scope = document.querySelector('input[name="catScope"]:checked').value;
+  const hint = document.getElementById('catScopeHint');
+  if (scope === 'ipad') {
+    hint.textContent = 'Appears as a sub-filter under iPad (e.g. Battery, Camera, Face ID, Speaker).';
+    document.getElementById('catName').placeholder = 'e.g. Battery, Camera, Face ID, Speaker…';
+  } else {
+    hint.textContent = 'Appears as a top-level filter and Brand option (e.g. iWatch, MacBook).';
+    document.getElementById('catName').placeholder = 'e.g. iWatch, MacBook, Google Pixel Parts…';
+  }
 }
 // Allow Enter key in modal
 document.addEventListener('DOMContentLoaded', () => {
@@ -661,30 +735,42 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function saveCategory() {
-  const name = document.getElementById('catName').value.trim();
+  const name  = document.getElementById('catName').value.trim();
+  const scope = document.querySelector('input[name="catScope"]:checked').value;
   const errEl = document.getElementById('catError');
   errEl.textContent = '';
 
   if (!name) { errEl.textContent = 'Please enter a category name.'; return; }
 
-  const allExisting = ['all','iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera','Other', ...customCategories];
-  if (allExisting.map(c => c.toLowerCase()).includes(name.toLowerCase())) {
-    errEl.textContent = 'That category already exists.'; return;
+  if (scope === 'ipad') {
+    const existing = ['all','LCD','Digitizer', ...ipadCustomCategories];
+    if (existing.map(c => c.toLowerCase()).includes(name.toLowerCase())) {
+      errEl.textContent = 'That iPad category already exists.'; return;
+    }
+    ipadCustomCategories.push(name);
+    saveIpadCustomCategories(ipadCustomCategories);
+    renderDynamicIpadFilters();
+    closeCatModal();
+    toast(`✅ iPad category "${name}" added!`);
+  } else {
+    const allExisting = ['all','iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera','Other', ...customCategories];
+    if (allExisting.map(c => c.toLowerCase()).includes(name.toLowerCase())) {
+      errEl.textContent = 'That category already exists.'; return;
+    }
+    customCategories.push(name);
+    saveCustomCategories(customCategories);
+    renderDynamicFilters();
+    populateBrandSelect();
+    closeCatModal();
+    toast(`✅ Category "${name}" added!`);
   }
-
-  customCategories.push(name);
-  saveCustomCategories(customCategories);
-  renderDynamicFilters();
-  populateBrandSelect();
-  closeCatModal();
-  toast(`✅ Category "${name}" added!`);
 }
 
 // -----------------------------------------------
 // EXPORT / IMPORT
 // -----------------------------------------------
 function exportData() {
-  const payload = { repairs, customCategories };
+  const payload = { repairs, customCategories, ipadCustomCategories };
   const json = JSON.stringify(payload, null, 2);
   const blob = new Blob([json], { type:'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -703,25 +789,27 @@ function importData(event) {
   reader.onload = (e) => {
     try {
       const parsed = JSON.parse(e.target.result);
-      // Support both old format (plain array) and new format (object with repairs + categories)
-      let newRepairs, newCats;
+      let newRepairs, newCats, newIpadCats;
       if (Array.isArray(parsed)) {
-        newRepairs = parsed;
-        newCats = [];
+        newRepairs = parsed; newCats = []; newIpadCats = [];
       } else if (parsed.repairs && Array.isArray(parsed.repairs)) {
-        newRepairs = parsed.repairs;
-        newCats = parsed.customCategories || [];
+        newRepairs   = parsed.repairs;
+        newCats      = parsed.customCategories || [];
+        newIpadCats  = parsed.ipadCustomCategories || [];
       } else {
         throw new Error('Invalid format');
       }
-      if (!confirm(`Import ${newRepairs.length} repair entries and ${newCats.length} custom categories?\n\nThis will REPLACE your current data.`)) return;
+      if (!confirm(`Import ${newRepairs.length} repair entries?\n\nThis will REPLACE your current data.`)) return;
       repairs = newRepairs;
       customCategories = newCats;
+      ipadCustomCategories = newIpadCats;
       saveData(repairs);
       saveCustomCategories(customCategories);
+      saveIpadCustomCategories(ipadCustomCategories);
       renderAdminList();
       updateAdminCount();
       renderDynamicFilters();
+      renderDynamicIpadFilters();
       populateBrandSelect();
       toast(`✅ Imported ${newRepairs.length} entries!`);
     } catch(err) {
