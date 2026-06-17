@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repair Price Lookup — Internal Tool</title>
+  <title>Repair 1.0 / V1 — Internal Tool</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <div class="logo">
         <span class="logo-icon">🔧</span>
         <div>
-          <span class="logo-name">Repair Price Lookup</span>
+          <span class="logo-name">Repair 1.0 / V1</span>
           <span class="logo-sub">Internal Staff Tool</span>
         </div>
       </div>
@@ -57,6 +57,17 @@
         </div>
       </div>
     </section>
+
+    <!-- iPad sub-filters: LCD / Digitizer / custom iPad parts — shown only when iPad filter active -->
+    <div class="ipad-subfilters" id="ipadSubfilters" style="display:none">
+      <div class="ipad-subfilter-inner">
+        <span class="ipad-sub-label">iPad ›</span>
+        <button class="ipad-sub-btn active" data-icat="all">All iPad</button>
+        <button class="ipad-sub-btn" data-icat="LCD">LCD</button>
+        <button class="ipad-sub-btn" data-icat="Digitizer">Digitizer</button>
+        <span id="dynamicIpadFilters"></span>
+      </div>
+    </div>
 
     <main class="main-content" id="mainContent">
       <section class="most-used" id="mostUsed">
@@ -171,8 +182,21 @@
   <div class="modal-overlay" id="catModal" onclick="closeCatModalOutside(event)">
     <div class="modal-box">
       <div class="modal-title">➕ Add New Category</div>
-      <div class="modal-sub">Create a new brand or repair group. It will appear as a filter and a Brand option in the form — no code changes needed.</div>
-      <input type="text" class="modal-input" id="catName" placeholder="e.g. iWatch, MacBook, Google Pixel Parts…" />
+      <div class="modal-sub">Choose where to add this category.</div>
+
+      <div class="modal-scope-row">
+        <label class="modal-scope-opt">
+          <input type="radio" name="catScope" value="global" checked onchange="updateCatScopeHint()" />
+          <span>Global brand / group</span>
+        </label>
+        <label class="modal-scope-opt">
+          <input type="radio" name="catScope" value="ipad" onchange="updateCatScopeHint()" />
+          <span>iPad repair type</span>
+        </label>
+      </div>
+      <p class="modal-scope-hint" id="catScopeHint">Appears as a top-level filter and Brand option (e.g. iWatch, MacBook).</p>
+
+      <input type="text" class="modal-input" id="catName" placeholder="e.g. iWatch, MacBook, Face ID, Speaker…" />
       <p class="modal-error" id="catError"></p>
       <div class="modal-actions">
         <button class="modal-cancel" onclick="closeCatModal()">Cancel</button>
@@ -182,7 +206,7 @@
   </div>
 
   <footer class="site-footer">
-    Repair Price Lookup · Internal Use Only · Prices subject to change
+    Repair 1.0 / V1 · Internal Use Only · Prices subject to change
   </footer>
 
   <script src="script.js"></script>
