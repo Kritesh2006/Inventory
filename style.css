@@ -421,69 +421,34 @@ body {
 #bootLoader.fade-out { opacity: 0; pointer-events: none; }
 .boot-inner { text-align: center; }
 .boot-orb {
-  width: 130px; height: 130px;
-  margin: 0 auto 28px;
-  animation: bootOrbFloat 3.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 25px rgba(0,255,120,.5));
-  transition: transform 1s cubic-bezier(.55,.06,.24,.99), width .8s ease, height .8s ease, filter .6s ease;
-  will-change: transform;
+  width: 180px; height: 180px;
+  margin: 0 auto 32px;
+  animation: bootOrbFloat 4.5s ease-in-out infinite;
+  transition: transform 1.1s cubic-bezier(.55,.06,.24,.99),
+              width 1.1s cubic-bezier(.55,.06,.24,.99),
+              height 1.1s cubic-bezier(.55,.06,.24,.99),
+              margin 1.1s cubic-bezier(.55,.06,.24,.99);
+  will-change: transform, width, height;
 }
 @keyframes bootOrbFloat {
   0%,100% { transform: translateY(0) scale(1);    }
-  50%      { transform: translateY(-8px) scale(1.03); }
-}
-.boot-brand {
-  font-family:'Inter',sans-serif;
-  font-size: 13px; font-weight: 500;
-  letter-spacing: 4px; color: #4eb87f;
-  text-transform: lowercase; margin-bottom: 18px;
-  opacity: 0.85;
-}
-.boot-msg {
-  font-family:'Inter',sans-serif;
-  font-size: 14px; color: #7dffb4;
-  min-height: 20px; letter-spacing: .5px;
-  font-weight: 400;
-  animation: bootMsgFade .5s ease;
-}
-@keyframes bootMsgFade {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  50%      { transform: translateY(-10px) scale(1.025); }
 }
 
-/* ======================================
-   PLASMA ORB SHARED ANIMATIONS
-   (used by boot orb + RON orb)
-   ====================================== */
-.orb-plasma {
-  transform-origin: 60px 60px;
-  animation: plasmaSwirl 6s linear infinite;
+/* Boot text — two lines, each fades cleanly */
+.boot-msg-stack { display: flex; flex-direction: column; gap: 6px; min-height: 44px; }
+.boot-line {
+  font-family:'Inter',sans-serif;
+  font-size: 15px; font-weight: 500;
+  color: #7dffb4; letter-spacing: .6px;
+  opacity: 0;
+  transition: opacity .6s ease;
+  min-height: 20px;
 }
-@keyframes plasmaSwirl {
-  0%   { transform: rotate(0deg) scale(1);    opacity: .9; }
-  50%  { transform: rotate(180deg) scale(1.08); opacity: 1; }
-  100% { transform: rotate(360deg) scale(1);  opacity: .9; }
-}
-.orb-bolts {
-  transform-origin: 60px 60px;
-  animation: boltsFlicker 2.4s ease-in-out infinite;
-}
-@keyframes boltsFlicker {
-  0%,100% { opacity: 0.4; transform: scale(1); }
-  20%      { opacity: 0.9; transform: scale(1.02); }
-  45%      { opacity: 0.5; }
-  70%      { opacity: 0.95; transform: scale(.98); }
-}
-.orb-p1 { animation: particleA 5.5s ease-in-out infinite; transform-origin: 60px 60px; }
-.orb-p2 { animation: particleB 6.2s ease-in-out infinite; transform-origin: 60px 60px; }
-.orb-p3 { animation: particleC 5.8s ease-in-out infinite; transform-origin: 60px 60px; }
-.orb-p4 { animation: particleD 6.5s ease-in-out infinite; transform-origin: 60px 60px; }
-@keyframes particleA { 0%,100%{transform:translate(0,0);opacity:.9} 50%{transform:translate(8px,-4px);opacity:.4} }
-@keyframes particleB { 0%,100%{transform:translate(0,0);opacity:.7} 50%{transform:translate(-6px,5px);opacity:1}  }
-@keyframes particleC { 0%,100%{transform:translate(0,0);opacity:.8} 50%{transform:translate(4px,-6px);opacity:.5} }
-@keyframes particleD { 0%,100%{transform:translate(0,0);opacity:.6} 50%{transform:translate(-5px,-3px);opacity:1} }
+.boot-line.visible { opacity: 1; }
+.boot-line-sub { color: #4eb87f; font-size: 13px; font-weight: 400; }
 
-/* Boot → RON orb fly animation */
+/* Boot → corner fly */
 #bootOrb.fly-to-corner {
   position: fixed !important;
   top: auto !important;
@@ -492,11 +457,84 @@ body {
   width: 62px; height: 62px;
   margin: 0;
   transform: translateY(0) scale(1);
-  filter: drop-shadow(0 0 12px rgba(0,255,120,.5));
   animation: none;
 }
 @media (max-width: 640px) {
   #bootOrb.fly-to-corner { left: 16px; bottom: 16px; }
+}
+
+/* ======================================
+   PLASMA ORB SHARED ANIMATIONS
+   (boot orb + RON orb both use these)
+   ====================================== */
+
+/* Plasma layer A — broad, slow, gentle breathing rotation */
+.plasma-a {
+  transform-origin: 100px 100px;
+  animation: plasmaABreathe 7s ease-in-out infinite;
+}
+@keyframes plasmaABreathe {
+  0%,100% { transform: rotate(0deg)   scale(1);    opacity: .9; }
+  50%      { transform: rotate(180deg) scale(1.08); opacity: 1;  }
+}
+
+/* Plasma layer B — hot core, faster, drifts off-center */
+.plasma-b {
+  transform-origin: 100px 100px;
+  animation: plasmaBSwirl 4.2s ease-in-out infinite;
+}
+@keyframes plasmaBSwirl {
+  0%   { transform: rotate(0deg)   translate(-4px,2px) scale(1);    }
+  33%  { transform: rotate(120deg) translate(6px,-3px) scale(1.06); }
+  66%  { transform: rotate(240deg) translate(-3px,5px) scale(.95);  }
+  100% { transform: rotate(360deg) translate(-4px,2px) scale(1);    }
+}
+
+/* Energy arcs — stroke-dashoffset flow, no jagged zigzags */
+.arc {
+  animation-name: arcFlow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.arc-1 { animation-duration: 4.5s; }
+.arc-2 { animation-duration: 5.8s; animation-direction: reverse; }
+.arc-3 { animation-duration: 6.6s; }
+@keyframes arcFlow {
+  from { stroke-dashoffset: 0;    }
+  to   { stroke-dashoffset: -280; }
+}
+
+/* Subtle arc-group breathing — they fade and brighten as a whole */
+.arc-group {
+  animation: arcsPulse 3.6s ease-in-out infinite;
+  transform-origin: 100px 100px;
+}
+@keyframes arcsPulse {
+  0%,100% { opacity: 0.55; }
+  50%      { opacity: 1;    }
+}
+
+/* Floating particles — each one drifts independently */
+.particles circle {
+  animation-name: particleDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  transform-origin: center;
+}
+.pa { animation-duration: 5.5s; animation-delay: 0s;    }
+.pb { animation-duration: 6.8s; animation-delay: -1.2s; }
+.pc { animation-duration: 5.2s; animation-delay: -2.5s; }
+.pd { animation-duration: 7.4s; animation-delay: -0.8s; }
+.pe { animation-duration: 6.1s; animation-delay: -3.0s; }
+.pf { animation-duration: 5.9s; animation-delay: -1.7s; }
+.pg { animation-duration: 4.8s; animation-delay: -0.4s; }
+.ph { animation-duration: 6.3s; animation-delay: -2.2s; }
+@keyframes particleDrift {
+  0%   { transform: translate(0,0)         scale(1);   opacity: .35; }
+  25%  { transform: translate(3px,-5px)    scale(1.3); opacity: 1;   }
+  50%  { transform: translate(-2px,-8px)   scale(.9);  opacity: .6;  }
+  75%  { transform: translate(-5px,-3px)   scale(1.2); opacity: .9;  }
+  100% { transform: translate(0,0)         scale(1);   opacity: .35; }
 }
 
 /* ======================================
