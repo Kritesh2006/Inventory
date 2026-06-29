@@ -13,28 +13,60 @@
   <!-- ===== BOOT LOADER ===== -->
   <div id="bootLoader">
     <div class="boot-inner">
-      <div class="boot-orb">
-        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <div class="boot-orb" id="bootOrb">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <radialGradient id="bg1" cx="38%" cy="35%" r="65%">
-              <stop offset="0%" stop-color="#a8ffcc"/>
-              <stop offset="40%" stop-color="#1aff6e"/>
-              <stop offset="100%" stop-color="#064d28"/>
+            <!-- Black glass shell -->
+            <radialGradient id="orbShell" cx="38%" cy="32%" r="68%">
+              <stop offset="0%"  stop-color="#1a3a26"/>
+              <stop offset="35%" stop-color="#062014"/>
+              <stop offset="100%" stop-color="#000000"/>
             </radialGradient>
-            <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#00ff88" stop-opacity="0.4"/>
-              <stop offset="100%" stop-color="#003a18" stop-opacity="0"/>
+            <!-- Emerald plasma core -->
+            <radialGradient id="orbPlasma" cx="42%" cy="40%" r="50%">
+              <stop offset="0%"  stop-color="#7dffb4" stop-opacity="0.95"/>
+              <stop offset="35%" stop-color="#00e864" stop-opacity="0.55"/>
+              <stop offset="75%" stop-color="#0a6b35" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
             </radialGradient>
+            <radialGradient id="orbGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"  stop-color="#00ff88" stop-opacity="0.55"/>
+              <stop offset="100%" stop-color="#003318" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="orbHi" cx="32%" cy="22%" r="22%">
+              <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+            <clipPath id="orbClipBoot"><circle cx="60" cy="60" r="44"/></clipPath>
+            <filter id="orbBlurBoot"><feGaussianBlur stdDeviation="2.5"/></filter>
           </defs>
-          <circle cx="40" cy="40" r="36" fill="url(#glow1)" opacity="0.6"/>
-          <circle cx="40" cy="40" r="30" fill="url(#bg1)" stroke="#0f5c2e" stroke-width="1.5"/>
-          <ellipse cx="32" cy="26" rx="9" ry="5" fill="white" opacity="0.18"/>
+          <!-- outer halo -->
+          <circle cx="60" cy="60" r="58" fill="url(#orbGlow)" filter="url(#orbBlurBoot)"/>
+          <!-- glass sphere -->
+          <circle cx="60" cy="60" r="44" fill="url(#orbShell)" stroke="#072014" stroke-width="1.2"/>
+          <!-- plasma core animated -->
+          <g clip-path="url(#orbClipBoot)">
+            <circle class="orb-plasma" cx="60" cy="60" r="38" fill="url(#orbPlasma)"/>
+            <!-- lightning bolts -->
+            <g class="orb-bolts" stroke="#b0ffd4" stroke-width="0.9" fill="none" opacity="0.7">
+              <path d="M60 26 L52 46 L62 46 L54 70"/>
+              <path d="M60 26 L70 44 L60 44 L66 68"/>
+              <path d="M40 38 L52 52 L46 52 L56 76"/>
+              <path d="M80 38 L66 52 L72 52 L62 76"/>
+            </g>
+            <!-- floating particles -->
+            <circle class="orb-p1" cx="48" cy="52" r="1.4" fill="#c8ffe0"/>
+            <circle class="orb-p2" cx="72" cy="58" r="1.1" fill="#c8ffe0"/>
+            <circle class="orb-p3" cx="58" cy="72" r="1.2" fill="#c8ffe0"/>
+            <circle class="orb-p4" cx="66" cy="44" r="0.9" fill="#c8ffe0"/>
+          </g>
+          <!-- glass reflection -->
+          <ellipse cx="48" cy="38" rx="14" ry="7" fill="url(#orbHi)"/>
+          <ellipse cx="74" cy="78" rx="6" ry="2" fill="#ffffff" opacity="0.12"/>
         </svg>
       </div>
-      <div class="boot-brand">REPAIR 1.0 / V1</div>
-      <div class="boot-msg" id="bootMsg">Initializing...</div>
-      <div class="boot-bar"><div class="boot-bar-fill" id="bootBarFill"></div></div>
-      <div class="boot-sub">Internal Staff System · Greensboro</div>
+      <div class="boot-brand">thisiskriteshserver</div>
+      <div class="boot-msg" id="bootMsg">&nbsp;</div>
     </div>
   </div>
 
@@ -225,43 +257,49 @@
 
   <!-- ===== RON ORB ===== -->
   <div id="ronOrb" onclick="ronToggle()" title="Ask RON">
-    <svg id="ronOrbSvg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <svg id="ronOrbSvg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="orbBg" cx="38%" cy="32%" r="70%">
-          <stop offset="0%"   stop-color="#b0ffd4"/>
-          <stop offset="30%"  stop-color="#00e864"/>
-          <stop offset="65%"  stop-color="#0a6b35"/>
-          <stop offset="100%" stop-color="#02230f"/>
+        <!-- Black glass shell -->
+        <radialGradient id="rOrbShell" cx="38%" cy="32%" r="68%">
+          <stop offset="0%"  stop-color="#1a3a26"/>
+          <stop offset="35%" stop-color="#062014"/>
+          <stop offset="100%" stop-color="#000000"/>
         </radialGradient>
-        <radialGradient id="orbGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stop-color="#00ff88" stop-opacity="0.55"/>
+        <!-- Emerald plasma -->
+        <radialGradient id="rOrbPlasma" cx="42%" cy="40%" r="50%">
+          <stop offset="0%"  stop-color="#7dffb4" stop-opacity="0.95"/>
+          <stop offset="35%" stop-color="#00e864" stop-opacity="0.55"/>
+          <stop offset="75%" stop-color="#0a6b35" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="rOrbGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"  stop-color="#00ff88" stop-opacity="0.55"/>
           <stop offset="100%" stop-color="#003318" stop-opacity="0"/>
         </radialGradient>
-        <radialGradient id="orbRed" cx="70%" cy="72%" r="42%">
-          <stop offset="0%"   stop-color="#ff3a3a" stop-opacity="0.55"/>
-          <stop offset="100%" stop-color="#7a0000" stop-opacity="0"/>
+        <radialGradient id="rOrbHi" cx="32%" cy="22%" r="22%">
+          <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
         </radialGradient>
-        <filter id="orbBlur">
-          <feGaussianBlur stdDeviation="3.5"/>
-        </filter>
+        <clipPath id="rOrbClip"><circle cx="60" cy="60" r="44"/></clipPath>
+        <filter id="rOrbBlur"><feGaussianBlur stdDeviation="3"/></filter>
       </defs>
-      <!-- outer glow -->
-      <circle cx="40" cy="40" r="38" fill="url(#orbGlow)" filter="url(#orbBlur)"/>
-      <!-- red energy accent -->
-      <circle cx="40" cy="40" r="30" fill="url(#orbRed)"/>
-      <!-- main sphere -->
-      <circle cx="40" cy="40" r="30" fill="url(#orbBg)" stroke="#0e4a26" stroke-width="1.2"/>
-      <!-- lightning lines -->
-      <g stroke="#a0ffc8" stroke-width="0.9" opacity="0.6" fill="none">
-        <path d="M40 14 L35 28 L42 28 L36 46"/>
-        <path d="M40 14 L46 30 L39 30 L44 46"/>
-        <path d="M28 22 L34 35 L30 35 L36 52"/>
-        <path d="M52 22 L46 35 L50 35 L44 52"/>
-        <path d="M22 40 L34 38 L30 44 L42 42"/>
-        <path d="M58 40 L46 42 L50 36 L38 38"/>
+      <circle cx="60" cy="60" r="58" fill="url(#rOrbGlow)" filter="url(#rOrbBlur)"/>
+      <circle cx="60" cy="60" r="44" fill="url(#rOrbShell)" stroke="#072014" stroke-width="1.2"/>
+      <g clip-path="url(#rOrbClip)">
+        <circle class="orb-plasma" cx="60" cy="60" r="38" fill="url(#rOrbPlasma)"/>
+        <g class="orb-bolts" stroke="#b0ffd4" stroke-width="0.9" fill="none" opacity="0.7">
+          <path d="M60 26 L52 46 L62 46 L54 70"/>
+          <path d="M60 26 L70 44 L60 44 L66 68"/>
+          <path d="M40 38 L52 52 L46 52 L56 76"/>
+          <path d="M80 38 L66 52 L72 52 L62 76"/>
+        </g>
+        <circle class="orb-p1" cx="48" cy="52" r="1.4" fill="#c8ffe0"/>
+        <circle class="orb-p2" cx="72" cy="58" r="1.1" fill="#c8ffe0"/>
+        <circle class="orb-p3" cx="58" cy="72" r="1.2" fill="#c8ffe0"/>
+        <circle class="orb-p4" cx="66" cy="44" r="0.9" fill="#c8ffe0"/>
       </g>
-      <!-- highlight -->
-      <ellipse cx="32" cy="24" rx="9" ry="5" fill="white" opacity="0.2"/>
+      <ellipse cx="48" cy="38" rx="14" ry="7" fill="url(#rOrbHi)"/>
+      <ellipse cx="74" cy="78" rx="6" ry="2" fill="#ffffff" opacity="0.12"/>
     </svg>
     <div id="ronBubble" class="ron-bubble" style="display:none"></div>
   </div>
