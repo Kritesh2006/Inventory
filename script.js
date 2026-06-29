@@ -234,45 +234,53 @@ let activeIpadSubCategory = 'all';
 let editingId = null;
 
 // -----------------------------------------------
-// BOOT LOADER
+// BOOT LOADER  (CHANGE 4 — minimal, premium)
 // -----------------------------------------------
-const BOOT_MESSAGES = [
-  'Redirecting…',
-  'Searching server…',
-  'Connecting to Greensboro RON Server…',
-  'Kritesh system initialized…',
-  'RON initialized…',
-  'Loading Repair 1.0…',
-];
-
 function runBoot() {
-  const loader  = document.getElementById('bootLoader');
-  const msgEl   = document.getElementById('bootMsg');
-  const barFill = document.getElementById('bootBarFill');
-  if (!loader) return;
+  const loader = document.getElementById('bootLoader');
+  const msgEl  = document.getElementById('bootMsg');
+  const orbEl  = document.getElementById('bootOrb');
+  if (!loader || !msgEl) return;
 
-  const totalMs = 4200;
-  const step    = totalMs / BOOT_MESSAGES.length;
-  let   idx     = 0;
+  // Sequence: blank → "Redirecting..." → "Loading RON..." → "RON Online" → fly to corner
+  const setMsg = (txt) => {
+    msgEl.style.animation = 'none';
+    // Force reflow so animation replays
+    void msgEl.offsetWidth;
+    msgEl.style.animation = '';
+    msgEl.textContent = txt;
+  };
 
-  msgEl.textContent = BOOT_MESSAGES[0];
-  barFill.style.width = '5%';
+  setTimeout(() => setMsg('Redirecting…'),    300);
+  setTimeout(() => setMsg('Loading RON…'),    1800);
+  setTimeout(() => setMsg('RON Online'),      3100);
 
-  const iv = setInterval(() => {
-    idx++;
-    if (idx >= BOOT_MESSAGES.length) {
-      clearInterval(iv);
-      barFill.style.width = '100%';
-      msgEl.textContent = '✓ RON ONLINE';
-      setTimeout(() => {
-        loader.classList.add('fade-out');
-        setTimeout(() => { loader.style.display = 'none'; }, 850);
-      }, 500);
-      return;
+  // Fly orb to corner, then fade out boot screen
+  setTimeout(() => {
+    if (orbEl) {
+      // Capture starting rect for precise flight
+      const rect = orbEl.getBoundingClientRect();
+      orbEl.style.position = 'fixed';
+      orbEl.style.top  = rect.top + 'px';
+      orbEl.style.left = rect.left + 'px';
+      orbEl.style.margin = 0;
+      // Force reflow before adding the destination class
+      void orbEl.offsetWidth;
+      orbEl.classList.add('fly-to-corner');
     }
-    msgEl.textContent = BOOT_MESSAGES[idx];
-    barFill.style.width = ((idx + 1) / BOOT_MESSAGES.length * 100) + '%';
-  }, step);
+    msgEl.style.opacity = '0';
+    msgEl.style.transition = 'opacity .4s';
+  }, 3700);
+
+  setTimeout(() => {
+    loader.classList.add('fade-out');
+    setTimeout(() => {
+      loader.style.display = 'none';
+      // Reveal real RON orb (which was hidden during boot)
+      const realOrb = document.getElementById('ronOrb');
+      if (realOrb) realOrb.style.opacity = '1';
+    }, 850);
+  }, 4200);
 }
 
 // -----------------------------------------------
@@ -442,9 +450,17 @@ function extractModelNumber(q) {
 function modelNumberMatches(entry, queryModelNum) {
   if (!queryModelNum) return true; // no number constraint — let everything through
   const haystack = normalize(entry.model) + ' ' + (entry.keywords || []).map(normalize).join(' ');
-  // The model number from the query must appear as a standalone token in the entry
-  const re = new RegExp('\\b' + queryModelNum.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
-  return re.test(haystack);
+
+  // If query has a prefixed token like 'a15' or 's23', match it exactly
+  if (/^[sa]\d+/i.test(queryModelNum)) {
+    const re = new RegExp('\\b' + queryModelNum.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
+    return re.test(haystack);
+  }
+
+  // Otherwise it's a bare number like '11', '13'. Match either bare ('iphone 11')
+  // or check if entry's brand context implies the same number lineage.
+  const bareRe = new RegExp('\\b' + queryModelNum.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
+  return bareRe.test(haystack);
 }
 
 function matchScore(entry, query) {
@@ -806,13 +822,29 @@ const RON_IDLE_BUBBLES = [
   'I\'m still here...',
 ];
 
-// --- Personality responses ---
+// --- Personality responses (Change 6 — specific opening) ---
 const RON_GREETINGS = [
-  'Hey! What repair are we looking up?',
-  'Got it. What model?',
-  'RON online. What do you need?',
-  'I\'m here. What\'s the repair?',
+  "Hey, I'm RON. Your personal repair assistant. What repair price can I help you find today?"
 ];
+
+// --- Idle bubbles (Change 5) ---
+const RON_IDLE_BUBBLES_V2 = [
+  'Need a price?',
+  'Need help?',
+  "I'll find it faster.",
+  'Try me.',
+  'Still searching manually?',
+];
+
+// --- Unrelated topic guard (Change 8) ---
+const UNRELATED_KEYWORDS = [
+  'weather','joke','movie','politics','election','president','ronaldo','messi',
+  'football','soccer','basketball','programming','code','recipe','food','song',
+  'music','tell me about','story','news','stock','crypto','bitcoin','game','sport',
+  'who is','what is the meaning','girlfriend','poem','translate','homework',
+  'math','algebra','philosophy','language','dog','cat'
+];
+const UNRELATED_REPLY = "I'm only a simple repair assistant. Try asking me for a repair price. Nothing more.";
 
 // --- RON state ---
 let ronOpen         = false;
@@ -848,25 +880,29 @@ function ronShowBubble(text, durationMs = 3500) {
   ronBubbleTimer = setTimeout(() => { bubble.style.display = 'none'; }, durationMs);
 }
 
-// --- Idle timer: show bubbles after inactivity ---
+// --- Idle timer: show bubbles after inactivity (Change 5) ---
 function ronResetIdleTimer() {
   ronLastActivity = Date.now();
   clearTimeout(ronIdleTimer);
   clearTimeout(ronAnnoyTimer);
   if (!ronOpen) {
+    // Random interval 20-60s
+    const delay = 20000 + Math.floor(Math.random() * 40000);
     ronIdleTimer = setTimeout(() => {
-      const msg = RON_IDLE_BUBBLES[Math.floor(Math.random() * RON_IDLE_BUBBLES.length)];
+      const msg = RON_IDLE_BUBBLES_V2[Math.floor(Math.random() * RON_IDLE_BUBBLES_V2.length)];
       ronShowBubble(msg, 4000);
       ronSetMood('normal', 0);
-      // Annoy phase after further wait
+      // After bubble fades, schedule the next one
+      setTimeout(() => ronResetIdleTimer(), 4500);
+      // Annoyed phase after very long ignore
       ronAnnoyTimer = setTimeout(() => {
         if (!ronOpen) {
           ronSetMood('annoyed', 2000);
-          const annoyMsgs = ["I'm still here...", "You know I can do that faster.", "Manual searching again?"];
+          const annoyMsgs = ["I'm still here.", "Need a price?", "Still searching manually?"];
           ronShowBubble(annoyMsgs[Math.floor(Math.random()*annoyMsgs.length)], 4000);
         }
-      }, 30000);
-    }, 20000);
+      }, 60000);
+    }, delay);
   }
 }
 
@@ -884,7 +920,7 @@ function ronToggle() {
     clearTimeout(ronIdleTimer);
     clearTimeout(ronAnnoyTimer);
     if (document.getElementById('ronMessages').children.length === 0) {
-      ronAppend('ron', RON_GREETINGS[Math.floor(Math.random() * RON_GREETINGS.length)]);
+      ronAppend('ron', RON_GREETINGS[0]);
     }
     setTimeout(() => document.getElementById('ronInput').focus(), 100);
   } else {
@@ -1125,8 +1161,19 @@ function ronProcess(input) {
   }
 
   // ---- GREETING ----
-  if (/^(hi|hey|hello|yo|sup|what'?s up|wassup)/.test(lower)) {
-    ronAppend('ron', RON_GREETINGS[Math.floor(Math.random() * RON_GREETINGS.length)]);
+  if (/^(hi|hey|hello|yo|sup|what'?s up|wassup|ron\??$)/.test(lower)) {
+    ronAppend('ron', RON_GREETINGS[0]);
+    return;
+  }
+
+  // ---- UNRELATED TOPIC GUARD (Change 8) ----
+  // Only trigger if the message is clearly off-topic — has no repair/model words
+  // AND contains a known unrelated keyword OR is a long sentence without numbers
+  const looksLikePriceQuery = /\b(iphone|ipad|samsung|galaxy|pixel|moto|ip|lcd|screen|display|battery|charging|charge|camera|cam|digi|digitizer|port|speaker|proximity|fix|repair|cost|price|how much|s\d+|a\d+|\d+[a-z]?|add)\b/i.test(lower);
+  const looksUnrelated = UNRELATED_KEYWORDS.some(k => lower.includes(k));
+  if (!looksLikePriceQuery && (looksUnrelated || lower.split(/\s+/).length >= 4)) {
+    ronSetMood('confused', 1500);
+    ronAppend('ron', UNRELATED_REPLY);
     return;
   }
 
@@ -1140,7 +1187,7 @@ function ronProcess(input) {
 
     if (results.length === 0) {
       ronSetMood('confused', 2000);
-      ronAppend('ron', 'Call your manager for price info please. I don\'t have that data yet.');
+      ronAppend('ron', "Call your manager for price info please. I don't have that data yet.");
       return;
     }
 
@@ -1151,23 +1198,52 @@ function ronProcess(input) {
       return;
     }
 
-    if (results.length <= 5) {
+    // Check if all results are clearly the same family (e.g. iPhone 13 + 13 Mini + 13 Pro + 13 Pro Max)
+    // — same brand. Then just show them; not ambiguous.
+    const brands = new Set(results.map(r => r.brand));
+    const types  = new Set(results.map(r => r.repairType));
+
+    if (results.length <= 5 && brands.size === 1) {
       ronSetMood('happy', 1500);
       ronAppend('ron', `Found ${results.length} matches:`, false);
       results.forEach(r => ronAppend('ron', ronBuildCard(r), true));
       return;
     }
 
-    // Many results — ask to narrow
+    // Multiple brands → truly ambiguous, ask for clarification (Change 7)
+    if (brands.size > 1) {
+      ronSetMood('confused', 1500);
+      const brandList = [...brands];
+      let chipsHtml = '<div class="ron-chips">';
+      brandList.forEach(b => {
+        const count = results.filter(r => r.brand === b).length;
+        const label = `${b} (${count})`;
+        chipsHtml += `<button class="ron-chip" onclick="ronChipClick('${(raw + ' ' + b).replace(/'/g,"\\'")}')">${label}</button>`;
+      });
+      chipsHtml += '</div>';
+      ronAppend('ron', `Do you mean:`, false);
+      ronAppend('ron', chipsHtml, true);
+      return;
+    }
+
+    // Same brand but many — show all (within reason)
+    if (results.length <= 8) {
+      ronSetMood('happy', 1500);
+      ronAppend('ron', `Found ${results.length} matches:`, false);
+      results.forEach(r => ronAppend('ron', ronBuildCard(r), true));
+      return;
+    }
+
+    // Too many — chip suggestions
     ronSetMood('confused', 1500);
-    const preview = results.slice(0, 4);
+    const preview = results.slice(0, 5);
     let chipsHtml = '<div class="ron-chips">';
     preview.forEach(r => {
       const label = r.model + ' ' + r.repairType;
-      chipsHtml += `<button class="ron-chip" onclick="ronChipClick('${label.replace(/'/g,"\\'")}') ">${label}</button>`;
+      chipsHtml += `<button class="ron-chip" onclick="ronChipClick('${label.replace(/'/g,"\\'")}')">${label}</button>`;
     });
     chipsHtml += '</div>';
-    ronAppend('ron', `I found ${results.length} results. Which one did you mean?`, false);
+    ronAppend('ron', `Which one did you mean?`, false);
     ronAppend('ron', chipsHtml, true);
   }, 650);
 }
