@@ -234,31 +234,35 @@ let activeIpadSubCategory = 'all';
 let editingId = null;
 
 // -----------------------------------------------
-// BOOT LOADER  (CHANGE 4 — minimal, premium)
+// BOOT LOADER  (premium, minimal)
 // -----------------------------------------------
 function runBoot() {
   const loader = document.getElementById('bootLoader');
-  const msgEl  = document.getElementById('bootMsg');
+  const line1  = document.getElementById('bootLine1');
+  const line2  = document.getElementById('bootLine2');
   const orbEl  = document.getElementById('bootOrb');
-  if (!loader || !msgEl) return;
+  if (!loader || !line1 || !line2) return;
 
-  // Sequence: blank → "Redirecting..." → "Loading RON..." → "RON Online" → fly to corner
-  const setMsg = (txt) => {
-    msgEl.style.animation = 'none';
-    // Force reflow so animation replays
-    void msgEl.offsetWidth;
-    msgEl.style.animation = '';
-    msgEl.textContent = txt;
-  };
+  // Sequence: blank (300ms) → line 1 fades in → line 2 fades in beneath → orb flies → fade out
+  setTimeout(() => {
+    line1.textContent = 'nxtlevel server initialized';
+    line1.classList.add('visible');
+  }, 600);
 
-  setTimeout(() => setMsg('Redirecting…'),    300);
-  setTimeout(() => setMsg('Loading RON…'),    1800);
-  setTimeout(() => setMsg('RON Online'),      3100);
+  setTimeout(() => {
+    line2.textContent = 'connecting to developer device…';
+    line2.classList.add('visible');
+  }, 1900);
 
-  // Fly orb to corner, then fade out boot screen
+  // Begin flight to corner at ~3.2s — text starts to fade
+  setTimeout(() => {
+    line1.classList.remove('visible');
+    line2.classList.remove('visible');
+  }, 3000);
+
   setTimeout(() => {
     if (orbEl) {
-      // Capture starting rect for precise flight
+      // Lock current position so the transition is geometrically smooth
       const rect = orbEl.getBoundingClientRect();
       orbEl.style.position = 'fixed';
       orbEl.style.top  = rect.top + 'px';
@@ -268,15 +272,12 @@ function runBoot() {
       void orbEl.offsetWidth;
       orbEl.classList.add('fly-to-corner');
     }
-    msgEl.style.opacity = '0';
-    msgEl.style.transition = 'opacity .4s';
-  }, 3700);
+  }, 3200);
 
   setTimeout(() => {
     loader.classList.add('fade-out');
     setTimeout(() => {
       loader.style.display = 'none';
-      // Reveal real RON orb (which was hidden during boot)
       const realOrb = document.getElementById('ronOrb');
       if (realOrb) realOrb.style.opacity = '1';
     }, 850);
@@ -822,21 +823,20 @@ const RON_IDLE_BUBBLES = [
   'I\'m still here...',
 ];
 
-// --- Personality responses (Change 6 — specific opening) ---
+// --- Personality responses ---
 const RON_GREETINGS = [
-  "Hey, I'm RON. Your personal repair assistant. What repair price can I help you find today?"
+  "Hey, I'm RON. Your personal repair assistant. What repair price can I help you with?"
 ];
 
-// --- Idle bubbles (Change 5) ---
+// --- Idle bubbles (20–45s interval) ---
 const RON_IDLE_BUBBLES_V2 = [
   'Need a price?',
-  'Need help?',
-  "I'll find it faster.",
-  'Try me.',
+  "I'll help.",
   'Still searching manually?',
+  'Ask me.',
 ];
 
-// --- Unrelated topic guard (Change 8) ---
+// --- Unrelated topic guard ---
 const UNRELATED_KEYWORDS = [
   'weather','joke','movie','politics','election','president','ronaldo','messi',
   'football','soccer','basketball','programming','code','recipe','food','song',
@@ -844,7 +844,7 @@ const UNRELATED_KEYWORDS = [
   'who is','what is the meaning','girlfriend','poem','translate','homework',
   'math','algebra','philosophy','language','dog','cat'
 ];
-const UNRELATED_REPLY = "I'm only a simple repair assistant. Try asking me for a repair price. Nothing more.";
+const UNRELATED_REPLY = "Sorry, I'm too simple to answer that. Try asking me for a repair price.";
 
 // --- RON state ---
 let ronOpen         = false;
@@ -886,8 +886,8 @@ function ronResetIdleTimer() {
   clearTimeout(ronIdleTimer);
   clearTimeout(ronAnnoyTimer);
   if (!ronOpen) {
-    // Random interval 20-60s
-    const delay = 20000 + Math.floor(Math.random() * 40000);
+    // Random interval 20-45s
+    const delay = 20000 + Math.floor(Math.random() * 25000);
     ronIdleTimer = setTimeout(() => {
       const msg = RON_IDLE_BUBBLES_V2[Math.floor(Math.random() * RON_IDLE_BUBBLES_V2.length)];
       ronShowBubble(msg, 4000);
@@ -937,18 +937,33 @@ function ronAppend(who, content, isHtml = false) {
   wrap.className = 'ron-msg ' + who;
 
   if (who === 'ron') {
+    const uid = 'a' + Date.now() + Math.random().toString(36).slice(2,6);
     wrap.innerHTML = `
       <div class="ron-msg-avatar">
         <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <radialGradient id="aOrbBg${Date.now()}" cx="38%" cy="32%" r="70%">
-              <stop offset="0%" stop-color="#b0ffd4"/>
-              <stop offset="35%" stop-color="#00e864"/>
-              <stop offset="100%" stop-color="#02230f"/>
+            <radialGradient id="${uid}-shell" cx="38%" cy="32%" r="72%">
+              <stop offset="0%"   stop-color="#0a2418" stop-opacity="0.9"/>
+              <stop offset="60%"  stop-color="#020906"/>
+              <stop offset="100%" stop-color="#000000"/>
             </radialGradient>
+            <radialGradient id="${uid}-plasma" cx="40%" cy="38%" r="55%">
+              <stop offset="0%"  stop-color="#9affc4" stop-opacity="0.95"/>
+              <stop offset="35%" stop-color="#1aff7c" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="${uid}-halo" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"  stop-color="#3dff8a" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+            </radialGradient>
+            <clipPath id="${uid}-clip"><circle cx="18" cy="18" r="13"/></clipPath>
           </defs>
-          <circle cx="18" cy="18" r="16" fill="url(#aOrbBg${Date.now()})" stroke="#0e4a26" stroke-width="1"/>
-          <ellipse cx="13" cy="11" rx="5" ry="3" fill="white" opacity="0.2"/>
+          <circle cx="18" cy="18" r="17" fill="url(#${uid}-halo)"/>
+          <circle cx="18" cy="18" r="13" fill="url(#${uid}-shell)"/>
+          <g clip-path="url(#${uid}-clip)">
+            <ellipse cx="18" cy="18" rx="12" ry="10" fill="url(#${uid}-plasma)"/>
+          </g>
+          <ellipse cx="14" cy="13" rx="3.5" ry="1.8" fill="#ffffff" opacity="0.35" transform="rotate(-22 14 13)"/>
         </svg>
       </div>`;
     const bubble = document.createElement('div');
@@ -976,7 +991,29 @@ function ronThinkingStart() {
   dots.className = 'ron-msg ron';
   dots.id = 'ronThinkDots';
   dots.innerHTML = `<div class="ron-msg-avatar"><svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="18" cy="18" r="16" fill="#0a3d22" stroke="#0e4a26" stroke-width="1"/>
+    <defs>
+      <radialGradient id="thinkShell" cx="38%" cy="32%" r="72%">
+        <stop offset="0%"   stop-color="#0a2418" stop-opacity="0.9"/>
+        <stop offset="60%"  stop-color="#020906"/>
+        <stop offset="100%" stop-color="#000000"/>
+      </radialGradient>
+      <radialGradient id="thinkPlasma" cx="40%" cy="38%" r="55%">
+        <stop offset="0%"  stop-color="#9affc4" stop-opacity="0.95"/>
+        <stop offset="35%" stop-color="#1aff7c" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="thinkHalo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"  stop-color="#3dff8a" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+      </radialGradient>
+      <clipPath id="thinkClip"><circle cx="18" cy="18" r="13"/></clipPath>
+    </defs>
+    <circle cx="18" cy="18" r="17" fill="url(#thinkHalo)"/>
+    <circle cx="18" cy="18" r="13" fill="url(#thinkShell)"/>
+    <g clip-path="url(#thinkClip)">
+      <ellipse cx="18" cy="18" rx="12" ry="10" fill="url(#thinkPlasma)"/>
+    </g>
+    <ellipse cx="14" cy="13" rx="3.5" ry="1.8" fill="#ffffff" opacity="0.35" transform="rotate(-22 14 13)"/>
     </svg></div>
     <div class="ron-msg-bubble"><div class="ron-thinking"><span></span><span></span><span></span></div></div>`;
   box.appendChild(dots);
