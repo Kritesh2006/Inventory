@@ -1,1316 +1,767 @@
-/* =============================================
-   REPAIR 1.0 / V1 — script.js
-   Changes: Search fix · RON orb+chat · Boot loader
-   ============================================= */
+/* =========================================
+   REPAIR 1.0 / V1 — Internal Tool
+   Theme: Rich Professional Green
+   ========================================= */
 
-// -----------------------------------------------
-// DEFAULT DATA
-// -----------------------------------------------
-const DEFAULT_DATA = [
-  { id:'d1',  brand:'iPhone', model:'iPhone 6',           repairType:'LCD', nonProfit:50,  minimum:60,  maximum:75,  keywords:['iphone 6','6 lcd'] },
-  { id:'d2',  brand:'iPhone', model:'iPhone 6 Plus',      repairType:'LCD', nonProfit:55,  minimum:60,  maximum:75,  keywords:['6 plus','6+','6plus'] },
-  { id:'d3',  brand:'iPhone', model:'iPhone 6S',          repairType:'LCD', nonProfit:50,  minimum:70,  maximum:80,  keywords:['6s'] },
-  { id:'d4',  brand:'iPhone', model:'iPhone 6S Plus',     repairType:'LCD', nonProfit:55,  minimum:65,  maximum:80,  keywords:['6s plus','6s+','6splus'] },
-  { id:'d5',  brand:'iPhone', model:'iPhone 7',           repairType:'LCD', nonProfit:60,  minimum:65,  maximum:80,  keywords:['7 lcd','iphone7'] },
-  { id:'d6',  brand:'iPhone', model:'iPhone 7 Plus',      repairType:'LCD', nonProfit:60,  minimum:70,  maximum:80,  keywords:['7 plus','7+','7plus'] },
-  { id:'d7',  brand:'iPhone', model:'iPhone 8',           repairType:'LCD', nonProfit:65,  minimum:75,  maximum:90,  keywords:['8 lcd','iphone8'] },
-  { id:'d8',  brand:'iPhone', model:'iPhone 8 Plus',      repairType:'LCD', nonProfit:65,  minimum:75,  maximum:90,  keywords:['8 plus','8+','8plus'] },
-  { id:'d9',  brand:'iPhone', model:'iPhone SE (1st/2nd Gen)', repairType:'LCD', nonProfit:65, minimum:75, maximum:90, keywords:['se','se2','se 2nd','se1','se 1st','iphone se'] },
-  { id:'d10', brand:'iPhone', model:'iPhone X',           repairType:'LCD', nonProfit:80,  minimum:90,  maximum:120, keywords:['x lcd','iphone x'] },
-  { id:'d11', brand:'iPhone', model:'iPhone XS',          repairType:'LCD', nonProfit:80,  minimum:90,  maximum:120, keywords:['xs','iphone xs'] },
-  { id:'d12', brand:'iPhone', model:'iPhone XS Max',      repairType:'LCD', nonProfit:80,  minimum:100, maximum:140, keywords:['xs max','xsmax','xs m'] },
-  { id:'d13', brand:'iPhone', model:'iPhone XR',          repairType:'LCD', nonProfit:75,  minimum:90,  maximum:120, keywords:['xr','iphone xr'] },
-  { id:'d14', brand:'iPhone', model:'iPhone 11',          repairType:'LCD', nonProfit:75,  minimum:90,  maximum:130, keywords:['11 lcd','iphone 11'] },
-  { id:'d15', brand:'iPhone', model:'iPhone 11 Pro',      repairType:'LCD', nonProfit:80,  minimum:100, maximum:130, keywords:['11 pro','11pro'] },
-  { id:'d16', brand:'iPhone', model:'iPhone 11 Pro Max',  repairType:'LCD', nonProfit:100, minimum:120, maximum:150, keywords:['11 pm','11 pro max','11promax','11pm'] },
-  { id:'d17', brand:'iPhone', model:'iPhone 12 / 12 Pro', repairType:'LCD', nonProfit:90,  minimum:120, maximum:160, keywords:['12 lcd','12pro','iphone 12','12/12pro'] },
-  { id:'d18', brand:'iPhone', model:'iPhone 12 Pro Max',  repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['12 pm','12 pro max','12promax','12pm'] },
-  { id:'d19', brand:'iPhone', model:'iPhone 12 Mini',     repairType:'LCD', nonProfit:90,  minimum:120, maximum:160, keywords:['12 mini','12mini'] },
-  { id:'d20', brand:'iPhone', model:'iPhone 13',          repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['13 lcd','iphone 13'] },
-  { id:'d21', brand:'iPhone', model:'iPhone 13 Mini',     repairType:'LCD', nonProfit:115, minimum:140, maximum:180, keywords:['13 mini','13mini'] },
-  { id:'d22', brand:'iPhone', model:'iPhone 13 Pro',      repairType:'LCD', nonProfit:130, minimum:150, maximum:200, keywords:['13 pro','13pro'] },
-  { id:'d23', brand:'iPhone', model:'iPhone 13 Pro Max',  repairType:'LCD', nonProfit:140, minimum:180, maximum:320, keywords:['13 pm','13 pro max','13promax','13pm','iphone 13 pro max'] },
-  { id:'d24', brand:'iPhone', model:'iPhone 14',          repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['14 lcd','iphone 14'] },
-  { id:'d25', brand:'iPhone', model:'iPhone 14 Plus',     repairType:'LCD', nonProfit:140, minimum:160, maximum:200, keywords:['14 plus','14+','14plus'] },
-  { id:'d26', brand:'iPhone', model:'iPhone 14 Pro',      repairType:'LCD', nonProfit:145, minimum:180, maximum:220, keywords:['14 pro','14pro'] },
-  { id:'d27', brand:'iPhone', model:'iPhone 14 Pro Max',  repairType:'LCD', nonProfit:185, minimum:250, maximum:250, keywords:['14 pm','14 pro max','14promax','14pm'] },
-  { id:'d28', brand:'iPhone', model:'iPhone 15',          repairType:'LCD', nonProfit:130, minimum:160, maximum:200, keywords:['15 lcd','iphone 15'] },
-  { id:'d29', brand:'iPhone', model:'iPhone 15 Plus',     repairType:'LCD', nonProfit:140, minimum:180, maximum:230, keywords:['15 plus','15+','15plus'] },
-  { id:'d30', brand:'iPhone', model:'iPhone 15 Pro',      repairType:'LCD', nonProfit:145, minimum:190, maximum:260, keywords:['15 pro','15pro'] },
-  { id:'d31', brand:'iPhone', model:'iPhone 15 Pro Max',  repairType:'LCD', nonProfit:190, minimum:280, maximum:350, keywords:['15 pm','15 pro max','15promax','15pm'] },
-  { id:'d32', brand:'iPhone', model:'iPhone 16',          repairType:'LCD', nonProfit:140, minimum:170, maximum:220, keywords:['16 lcd','iphone 16'] },
-  { id:'d33', brand:'iPhone', model:'iPhone 16e',         repairType:'LCD', nonProfit:130, minimum:170, maximum:180, keywords:['16e','16 e'] },
-  { id:'d34', brand:'iPhone', model:'iPhone 16 Plus',     repairType:'LCD', nonProfit:150, minimum:200, maximum:250, keywords:['16 plus','16+','16plus'] },
-  { id:'d35', brand:'iPhone', model:'iPhone 16 Pro',      repairType:'LCD', nonProfit:140, minimum:200, maximum:220, keywords:['16 pro','16pro'] },
-  { id:'d36', brand:'iPhone', model:'iPhone 16 Pro Max',  repairType:'LCD', nonProfit:200, minimum:250, maximum:320, keywords:['16 pm','16 pro max','16promax','16pm'] },
-  { id:'d37', brand:'iPhone', model:'iPhone 17',          repairType:'LCD', nonProfit:280, minimum:300, maximum:380, keywords:['17 lcd','iphone 17'] },
-  { id:'d38', brand:'iPhone', model:'iPhone 17 Pro',      repairType:'LCD', nonProfit:290, minimum:350, maximum:400, keywords:['17 pro','17pro'] },
-  { id:'d39', brand:'iPhone', model:'iPhone 17 Pro Max',  repairType:'LCD', nonProfit:340, minimum:390, maximum:450, keywords:['17 pm','17 pro max','17promax','17pm'] },
-  { id:'d40', brand:'iPhone', model:'iPhone Camera (X – 12 Pro Max)', repairType:'Camera', minimum:80,  maximum:100, keywords:['iphone camera','x camera','11 camera','12 camera','xs camera','xr camera'] },
-  { id:'d41', brand:'iPhone', model:'iPhone Camera (13 / 14 / 14 Plus / 15 / 15 Plus)', repairType:'Camera', minimum:100, maximum:130, keywords:['13 camera','14 camera','15 camera'] },
-  { id:'d42', brand:'iPhone', model:'iPhone Camera (13 Pro / 13 PM / 14 Pro / 14 PM)', repairType:'Camera', minimum:150, maximum:200, keywords:['13 pro camera','14 pro camera','13pm camera','14pm camera'] },
-  { id:'d43', brand:'iPhone', model:'iPhone Proximity (Up to 12 Pro Max)', repairType:'Proximity', minimum:60, maximum:80, keywords:['proximity','iphone proximity','6 proximity','7 proximity','8 proximity','x proximity','11 proximity','12 proximity'] },
-  { id:'d44', brand:'iPhone', model:'iPhone Proximity (13 – 15 Pro Max)', repairType:'Proximity', minimum:80, maximum:100, keywords:['13 proximity','14 proximity','15 proximity'] },
-  { id:'d45', brand:'iPhone', model:'iPhone Charging Port / Speaker (Up to 12 Pro Max)', repairType:'Charging Port', minimum:60, maximum:100, keywords:['iphone charging','iphone port','charging port','6 port','7 port','8 port','x port','11 port','12 port','speaker','loud speaker'] },
-  { id:'d46', brand:'iPhone', model:'iPhone Charging Port / Speaker (13 – 15 Pro Max)', repairType:'Charging Port', minimum:80, maximum:160, keywords:['13 port','14 port','15 port','13 charging','14 charging','15 charging'] },
-  { id:'d47', brand:'iPhone', model:'iPhone Battery (8 / SE / X / XS / XS Max / XR)', repairType:'Battery', minimum:70, maximum:90, keywords:['8 battery','se battery','x battery','xs battery','xr battery'] },
-  { id:'d48', brand:'iPhone', model:'iPhone Battery (11 / 11 Pro / 11 Pro Max)', repairType:'Battery', minimum:80, maximum:100, keywords:['11 battery','11 pro battery','11 pm battery'] },
-  { id:'d49', brand:'iPhone', model:'iPhone Battery (12 / 12 Pro / 12 Pro Max)', repairType:'Battery', minimum:90, maximum:120, keywords:['12 battery','12 pro battery','12pm battery'] },
-  { id:'d50', brand:'iPhone', model:'iPhone Battery (13 / 13 Pro / 13 Pro Max)', repairType:'Battery', minimum:80, maximum:120, keywords:['13 battery','13 pro battery','13pm battery'] },
-  { id:'d51', brand:'iPhone', model:'iPhone Battery (14 / 14 Plus)', repairType:'Battery', minimum:80, maximum:120, keywords:['14 battery','14 plus battery'] },
-  { id:'d52', brand:'iPhone', model:'iPhone Battery (14 Pro / 14 Pro Max)', repairType:'Battery', minimum:100, maximum:140, keywords:['14 pro battery','14pm battery'] },
-  { id:'d53', brand:'iPhone', model:'iPhone Battery (15 / 15 Plus)', repairType:'Battery', minimum:100, maximum:150, keywords:['15 battery','15 plus battery'] },
-  { id:'d54', brand:'iPhone', model:'iPhone Battery (15 Pro / 15 Pro Max)', repairType:'Battery', minimum:120, maximum:180, keywords:['15 pro battery','15pm battery'] },
-  { id:'d55', brand:'iPhone', model:'iPhone Battery (16 Pro Max)', repairType:'Battery', minimum:140, maximum:200, keywords:['16 pro max battery','16pm battery'] },
-  { id:'d60', brand:'Samsung', model:'Samsung S8',         repairType:'LCD', nonProfit:140, minimum:170, maximum:200, keywords:['s8','galaxy s8'] },
-  { id:'d61', brand:'Samsung', model:'Samsung S8 Plus',    repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s8+','s8 plus'] },
-  { id:'d62', brand:'Samsung', model:'Samsung S9',         repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s9','galaxy s9'] },
-  { id:'d63', brand:'Samsung', model:'Samsung S9 Plus',    repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s9+','s9 plus'] },
-  { id:'d64', brand:'Samsung', model:'Samsung S10',        repairType:'LCD', nonProfit:145, minimum:180, maximum:220, keywords:['s10','galaxy s10'] },
-  { id:'d65', brand:'Samsung', model:'Samsung S10e',       repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s10e'] },
-  { id:'d66', brand:'Samsung', model:'Samsung S10 Plus',   repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s10+','s10 plus'] },
-  { id:'d67', brand:'Samsung', model:'Samsung S10 5G',     repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s10 5g'] },
-  { id:'d68', brand:'Samsung', model:'Samsung S10 Lite',   repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s10 lite'] },
-  { id:'d69', brand:'Samsung', model:'Samsung S20',        repairType:'LCD', nonProfit:160, minimum:190, maximum:240, keywords:['s20','galaxy s20'] },
-  { id:'d70', brand:'Samsung', model:'Samsung S20 FE',     repairType:'LCD', nonProfit:180, minimum:200, maximum:240, keywords:['s20 fe','s20fe'] },
-  { id:'d71', brand:'Samsung', model:'Samsung S20 Plus',   repairType:'LCD', nonProfit:195, minimum:220, maximum:260, keywords:['s20+','s20 plus'] },
-  { id:'d72', brand:'Samsung', model:'Samsung S20 Ultra',  repairType:'LCD', nonProfit:200, minimum:240, maximum:280, keywords:['s20 ultra','s20ultra'] },
-  { id:'d73', brand:'Samsung', model:'Samsung S21',        repairType:'LCD', nonProfit:170, minimum:200, maximum:240, keywords:['s21','galaxy s21'] },
-  { id:'d74', brand:'Samsung', model:'Samsung S21 FE',     repairType:'LCD', nonProfit:195, minimum:230, maximum:280, keywords:['s21 fe','s21fe'] },
-  { id:'d75', brand:'Samsung', model:'Samsung S21 Ultra',  repairType:'LCD', nonProfit:200, minimum:230, maximum:280, keywords:['s21 ultra','s21ultra'] },
-  { id:'d76', brand:'Samsung', model:'Samsung S22',        repairType:'LCD', nonProfit:200, minimum:230, maximum:280, keywords:['s22','galaxy s22'] },
-  { id:'d77', brand:'Samsung', model:'Samsung S22 Plus',   repairType:'LCD', nonProfit:200, minimum:230, maximum:280, keywords:['s22+','s22 plus'] },
-  { id:'d78', brand:'Samsung', model:'Samsung S22 Ultra',  repairType:'LCD', nonProfit:220, minimum:250, maximum:300, keywords:['s22 ultra','s22ultra'] },
-  { id:'d79', brand:'Samsung', model:'Samsung S23',        repairType:'LCD', nonProfit:205, minimum:230, maximum:280, keywords:['s23','galaxy s23'] },
-  { id:'d80', brand:'Samsung', model:'Samsung S23 Plus',   repairType:'LCD', nonProfit:220, minimum:250, maximum:280, keywords:['s23+','s23 plus'] },
-  { id:'d81', brand:'Samsung', model:'Samsung S23 FE',     repairType:'LCD', nonProfit:220, minimum:250, maximum:240, keywords:['s23 fe','s23fe'] },
-  { id:'d82', brand:'Samsung', model:'Samsung S23 Ultra',  repairType:'LCD', nonProfit:240, minimum:260, maximum:350, keywords:['s23 ultra','s23ultra'] },
-  { id:'d83', brand:'Samsung', model:'Samsung Note 8',     repairType:'LCD', nonProfit:190, minimum:210, maximum:250, keywords:['note 8','note8'] },
-  { id:'d84', brand:'Samsung', model:'Samsung Note 9',     repairType:'LCD', nonProfit:190, minimum:220, maximum:250, keywords:['note 9','note9'] },
-  { id:'d85', brand:'Samsung', model:'Samsung Note 10',    repairType:'LCD', nonProfit:200, minimum:230, maximum:260, keywords:['note 10','note10'] },
-  { id:'d86', brand:'Samsung', model:'Samsung Note 10 Plus', repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['note 10+','note 10 plus'] },
-  { id:'d87', brand:'Samsung', model:'Samsung Note 20',    repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['note 20','note20'] },
-  { id:'d88', brand:'Samsung', model:'Samsung Note 20 Ultra', repairType:'LCD', nonProfit:230, minimum:250, maximum:300, keywords:['note 20 ultra','note20ultra'] },
-  { id:'d89', brand:'Samsung', model:'Samsung A10e',  repairType:'LCD', nonProfit:70,  minimum:70,  maximum:80,  keywords:['a10e'] },
-  { id:'d90', brand:'Samsung', model:'Samsung A02s',  repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a02s'] },
-  { id:'d91', brand:'Samsung', model:'Samsung A03s',  repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a03s'] },
-  { id:'d92', brand:'Samsung', model:'Samsung A11',   repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a11'] },
-  { id:'d93', brand:'Samsung', model:'Samsung A12',   repairType:'LCD', nonProfit:75,  minimum:100, maximum:120, keywords:['a12'] },
-  { id:'d94', brand:'Samsung', model:'Samsung A13',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a13'] },
-  { id:'d95', brand:'Samsung', model:'Samsung A14',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a14'] },
-  { id:'d96', brand:'Samsung', model:'Samsung A15',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:160, keywords:['a15'] },
-  { id:'d97', brand:'Samsung', model:'Samsung A20',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a20'] },
-  { id:'d98', brand:'Samsung', model:'Samsung A21',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a21'] },
-  { id:'d99', brand:'Samsung', model:'Samsung A23',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a23'] },
-  { id:'d100',brand:'Samsung', model:'Samsung A32',   repairType:'LCD', nonProfit:80,  minimum:110, maximum:130, keywords:['a32'] },
-  { id:'d101',brand:'Samsung', model:'Samsung A42',   repairType:'LCD', nonProfit:100, minimum:110, maximum:130, keywords:['a42'] },
-  { id:'d102',brand:'Samsung', model:'Samsung A43',   repairType:'LCD', nonProfit:100, minimum:110, maximum:130, keywords:['a43'] },
-  { id:'d103',brand:'Samsung', model:'Samsung A52',   repairType:'LCD', nonProfit:90,  minimum:110, maximum:130, keywords:['a52'] },
-  { id:'d104',brand:'Samsung', model:'Samsung A53',   repairType:'LCD', nonProfit:120, minimum:140, maximum:160, keywords:['a53'] },
-  { id:'d105',brand:'Samsung', model:'Samsung A54',   repairType:'LCD', nonProfit:160, minimum:190, maximum:240, keywords:['a54'] },
-  { id:'d106',brand:'Samsung', model:'Samsung A55',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a55'] },
-  { id:'d107',brand:'Samsung', model:'Samsung A70',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a70'] },
-  { id:'d108',brand:'Samsung', model:'Samsung A71',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a71'] },
-  { id:'d109',brand:'Samsung', model:'Samsung A73',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a73'] },
-  { id:'d110',brand:'Samsung', model:'Samsung Battery (All A Series)', repairType:'Battery', minimum:60,  maximum:80,  keywords:['samsung battery','a series battery','samsung a battery'] },
-  { id:'d111',brand:'Samsung', model:'Samsung Battery (All S Series)', repairType:'Battery', minimum:120, maximum:120, keywords:['samsung s battery','s series battery','s20 battery','s21 battery','s22 battery','s23 battery'] },
-  { id:'d112',brand:'Samsung', model:'Samsung Charging Port (All A Series)', repairType:'Charging Port', minimum:60, maximum:90,  keywords:['samsung charging','samsung a port'] },
-  { id:'d113',brand:'Samsung', model:'Samsung Charging Port (All S Series)', repairType:'Charging Port', minimum:70, maximum:110, keywords:['samsung s port','samsung s charging','s21 port','s22 port','s23 port'] },
-  { id:'d120',brand:'Motorola', model:'Moto G Stylus 2020 (XT2043)',    repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['moto stylus','g stylus','stylus 2020','xt2043'] },
-  { id:'d121',brand:'Motorola', model:'Moto G Stylus 2021 4G (XT2115)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2021','xt2115','g stylus 2021 4g'] },
-  { id:'d122',brand:'Motorola', model:'Moto G Stylus 2021 5G (XT2131)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2021 5g','xt2131'] },
-  { id:'d123',brand:'Motorola', model:'Moto G Stylus 2022 (XT2211)',    repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2022','xt2211'] },
-  { id:'d124',brand:'Motorola', model:'Moto G Stylus 2023 (XT2315)',    repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['stylus 2023','xt2315','moto stylus 2023'] },
-  { id:'d125',brand:'Motorola', model:'Moto G 5G 2022 (XT2213)',        repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g 5g 2022','xt2213'] },
-  { id:'d126',brand:'Motorola', model:'Moto G 5G 2023 (XT2313)',        repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['g 5g 2023','xt2313'] },
-  { id:'d127',brand:'Motorola', model:'Moto One 5G Ace / G 5G (XT2113)',repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['one 5g ace','xt2113'] },
-  { id:'d128',brand:'Motorola', model:'Moto G Pure (XT2163)',            repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g pure','xt2163'] },
-  { id:'d129',brand:'Motorola', model:'Moto G Play 2023 (XT2271)',      repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['g play 2023','xt2271','moto g play'] },
-  { id:'d130',brand:'Motorola', model:'Moto G Fast (XT2045)',           repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g fast','xt2045'] },
-  { id:'d131',brand:'Motorola', model:'Moto G Power 2022 (XT2165)',     repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g power 2022','xt2165'] },
-  { id:'d132',brand:'Motorola', model:'Moto G Power 5G 2023 (XT2311)',  repairType:'LCD', nonProfit:110, minimum:110, maximum:150, keywords:['g power 5g','xt2311'] },
-  { id:'d133',brand:'Motorola', model:'Moto G Power (XT2041)',          repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g power xt2041','xt2041'] },
-  { id:'d134',brand:'Motorola', model:'Moto G Power / G10 Play 2021 (XT2117)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g10 play','xt2117'] },
-  { id:'d135',brand:'Motorola', model:'Motorola Battery (All Models)',   repairType:'Battery',       minimum:80, maximum:100, keywords:['motorola battery','moto battery'] },
-  { id:'d136',brand:'Motorola', model:'Motorola Charging Port (All Models)', repairType:'Charging Port', minimum:60, maximum:90, keywords:['motorola port','moto port','moto charging'] },
-  { id:'d140',brand:'Google Pixel', model:'Pixel 6',        repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['pixel 6','google pixel 6','p6'] },
-  { id:'d141',brand:'Google Pixel', model:'Pixel 6A',       repairType:'LCD', nonProfit:140, minimum:150, maximum:180, keywords:['pixel 6a','pixel6a','p6a'] },
-  { id:'d142',brand:'Google Pixel', model:'Pixel 7',        repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['pixel 7','google pixel 7','p7'] },
-  { id:'d143',brand:'Google Pixel', model:'Pixel 7A',       repairType:'LCD', nonProfit:140, minimum:150, maximum:180, keywords:['pixel 7a','pixel7a','p7a'] },
-  { id:'d144',brand:'Google Pixel', model:'Pixel 7 Pro',    repairType:'LCD', nonProfit:150, minimum:180, maximum:null, keywords:['pixel 7 pro','pixel7pro'] },
-  { id:'d145',brand:'Google Pixel', model:'Pixel 8A',       repairType:'LCD', nonProfit:140, minimum:180, maximum:null, keywords:['pixel 8a','pixel8a','p8a'] },
-  { id:'d146',brand:'Google Pixel', model:'Pixel 8 Pro',    repairType:'LCD', nonProfit:150, minimum:180, maximum:null, keywords:['pixel 8 pro','pixel8pro'] },
-  { id:'d147',brand:'Google Pixel', model:'Pixel 9A',       repairType:'LCD', nonProfit:160, minimum:190, maximum:null, keywords:['pixel 9a','pixel9a','p9a'] },
-  { id:'d148',brand:'Google Pixel', model:'Pixel 9 Pro',    repairType:'LCD', nonProfit:155, minimum:200, maximum:null, keywords:['pixel 9 pro','pixel9pro'] },
-  { id:'d149',brand:'Google Pixel', model:'Pixel 9 Pro XL', repairType:'LCD', nonProfit:250, minimum:320, maximum:null, keywords:['pixel 9 pro xl','9 pro xl'] },
-  { id:'d162',brand:'iPad', model:'iPad 7/8/9 LCD',               repairType:'LCD', nonProfit:120, minimum:150, maximum:180, keywords:['ipad 7 lcd','ipad 8 lcd','ipad 9 lcd'] },
-  { id:'d164',brand:'iPad', model:'iPad 10 LCD',                  repairType:'LCD', nonProfit:155, minimum:190, maximum:240, keywords:['ipad 10 lcd','ipad 10th gen lcd'] },
-  { id:'d165',brand:'iPad', model:'iPad 5/6 LCD',                 repairType:'LCD', nonProfit:120, minimum:130, maximum:160, keywords:['ipad 5 lcd','ipad 6 lcd'] },
-  { id:'d167',brand:'iPad', model:'iPad Air 1 LCD',               repairType:'LCD', nonProfit:100, minimum:120, maximum:150, keywords:['air 1 lcd','ipad air 1 lcd'] },
-  { id:'d168',brand:'iPad', model:'iPad Air 2 LCD',               repairType:'LCD', nonProfit:130, minimum:150, maximum:180, keywords:['air 2','ipad air 2'] },
-  { id:'d169',brand:'iPad', model:'iPad Air 3 LCD',               repairType:'LCD', nonProfit:130, minimum:150, maximum:180, keywords:['air 3','ipad air 3'] },
-  { id:'d170',brand:'iPad', model:'iPad Air 4 LCD',               repairType:'LCD', nonProfit:175, minimum:200, maximum:240, keywords:['air 4','ipad air 4'] },
-  { id:'d171',brand:'iPad', model:'iPad Air 5 LCD',               repairType:'LCD', nonProfit:180, minimum:200, maximum:250, keywords:['air 5','ipad air 5'] },
-  { id:'d173',brand:'iPad', model:'iPad Mini 1/2 LCD',            repairType:'LCD', nonProfit:160, minimum:200, maximum:290, keywords:['mini 1 lcd','mini 2 lcd','ipad mini 1 lcd','ipad mini 2 lcd'] },
-  { id:'d175',brand:'iPad', model:'iPad Mini 3 LCD',              repairType:'LCD', nonProfit:180, minimum:220, maximum:360, keywords:['mini 3 lcd','ipad mini 3 lcd'] },
-  { id:'d176',brand:'iPad', model:'iPad Mini 4 LCD',              repairType:'LCD', nonProfit:190, minimum:240, maximum:360, keywords:['mini 4','ipad mini 4'] },
-  { id:'d177',brand:'iPad', model:'iPad Mini 5 LCD',              repairType:'LCD', nonProfit:220, minimum:280, maximum:360, keywords:['mini 5','ipad mini 5'] },
-  { id:'d178',brand:'iPad', model:'iPad Mini 6 LCD',              repairType:'LCD', nonProfit:270, minimum:320, maximum:360, keywords:['mini 6','ipad mini 6'] },
-  { id:'d179',brand:'iPad', model:'iPad Pro 10.5 LCD',            repairType:'LCD', nonProfit:180, minimum:190, maximum:230, keywords:['pro 10.5','ipad pro 10','10.5 lcd'] },
-  { id:'d180',brand:'iPad', model:'iPad Pro 11 LCD (Gen 1/2)',    repairType:'LCD', nonProfit:190, minimum:220, maximum:260, keywords:['pro 11 gen 1','pro 11 gen 2','ipad pro 11 g1','ipad pro 11 g2'] },
-  { id:'d181',brand:'iPad', model:'iPad Pro 11 LCD (Gen 3/4)',    repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['pro 11 gen 3','pro 11 gen 4','ipad pro 11 g3','ipad pro 11 g4'] },
-  { id:'d182',brand:'iPad', model:'iPad Pro 12.9 LCD (Gen 3/4)',  repairType:'LCD', nonProfit:200, minimum:220, maximum:260, keywords:['pro 12.9 gen 3','pro 12.9 gen 4','ipad pro 12 g3'] },
-  { id:'d183',brand:'iPad', model:'iPad Pro 12.9 LCD (Gen 5/6)',  repairType:'LCD', nonProfit:275, minimum:300, maximum:380, keywords:['pro 12.9 gen 5','pro 12.9 gen 6','ipad pro 12 g5'] },
-  { id:'dg1', brand:'iPad', model:'iPad 5/6 Touch Digitizer',      repairType:'Digitizer', minimum:90,  maximum:150, keywords:['ipad 5 digi','ipad 6 digi','ipad 5 digitizer','ipad 6 digitizer','ipad 5 touch','ipad 6 touch'] },
-  { id:'dg2', brand:'iPad', model:'iPad 7/8/9 Touch Digitizer',    repairType:'Digitizer', minimum:90,  maximum:180, keywords:['ipad 7 digi','ipad 8 digi','ipad 9 digi','ipad 7 digitizer','ipad 7 touch'] },
-  { id:'dg3', brand:'iPad', model:'iPad 10 Touch Digitizer',       repairType:'Digitizer', minimum:100, maximum:180, keywords:['ipad 10 digi','ipad 10 digitizer','ipad 10 touch'] },
-  { id:'dg4', brand:'iPad', model:'iPad Air 1 Touch Digitizer',    repairType:'Digitizer', minimum:90,  maximum:140, keywords:['air 1 digi','air 1 touch','ipad air 1 digitizer'] },
-  { id:'dg5', brand:'iPad', model:'iPad Mini 1/2 Touch Digitizer', repairType:'Digitizer', minimum:85,  maximum:140, keywords:['mini 1 digi','mini 2 digi','mini 1 touch','mini 2 touch'] },
-  { id:'dg6', brand:'iPad', model:'iPad Mini 3 Touch Digitizer',   repairType:'Digitizer', minimum:180, maximum:360, keywords:['mini 3 digi','mini 3 touch','mini 3 digitizer'] },
-  { id:'d190',brand:'iPad', model:'iPad Battery (All iPads)',        repairType:'Battery',      minimum:130, maximum:180, keywords:['ipad battery','ipad air battery','ipad mini battery','ipad pro battery'] },
-  { id:'d191',brand:'iPad', model:'iPad Charging Port (All iPads)', repairType:'Charging Port', minimum:140, maximum:180, keywords:['ipad charging','ipad port'] },
-];
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-// -----------------------------------------------
-// QUICK-ACCESS chips
-// -----------------------------------------------
-const QUICK_REPAIRS = [
-  { label:'iPhone 11 LCD',         icon:'📱', searchFor:'iPhone 11 LCD' },
-  { label:'iPhone 13 LCD',         icon:'📱', searchFor:'iPhone 13 LCD' },
-  { label:'iPhone 13 Pro Max LCD', icon:'📱', searchFor:'iPhone 13 Pro Max' },
-  { label:'iPhone 14 Pro LCD',     icon:'📱', searchFor:'iPhone 14 Pro LCD' },
-  { label:'iPhone 15 Pro Max LCD', icon:'📱', searchFor:'iPhone 15 Pro Max' },
-  { label:'iPhone 16 Pro Max LCD', icon:'📱', searchFor:'iPhone 16 Pro Max' },
-  { label:'Samsung S23 Ultra LCD', icon:'📱', searchFor:'S23 Ultra' },
-  { label:'Pixel 8A LCD',          icon:'📱', searchFor:'Pixel 8A' },
-  { label:'iPhone Battery',        icon:'🔋', searchFor:'iPhone Battery' },
-  { label:'iPhone Charging Port',  icon:'🔌', searchFor:'iPhone Charging Port' },
-  { label:'Samsung Battery',       icon:'🔋', searchFor:'Samsung Battery' },
-  { label:'iPad Battery',          icon:'🔋', searchFor:'iPad Battery' },
-];
+:root {
+  /* Primary green palette — deep emerald, not neon */
+  --green-primary:  #1F6F50;
+  --green-dark:     #175640;
+  --green-mid:      #2E8B57;
+  --green-light:    #EAF6F0;
+  --green-border:   #B7DFD0;
+  --green-btn:      #1F6F50;
+  --green-btn-h:    #175640;
 
-// -----------------------------------------------
-// STORAGE
-// -----------------------------------------------
-const LS_KEY          = 'repairPriceData_v2';
-const LS_CAT_KEY      = 'repairCustomCategories';
-const LS_IPAD_CAT_KEY = 'repairIpadCustomCategories';
+  /* Status / tag colors */
+  --status-green:   #15803d;
+  --status-green-bg:#dcfce7;
+  --status-green-bd:#bbf7d0;
+  --purple:         #5b21b6;
+  --purple-bg:      #ede9fe;
+  --teal:           #0e7490;
+  --teal-bg:        #ecfeff;
+  --teal-bd:        #a5f3fc;
+  --red:            #dc2626;
+  --red-bg:         #fee2e2;
+  --amber:          #b45309;
+  --amber-bg:       #fef3c7;
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) { const p = JSON.parse(raw); if (Array.isArray(p) && p.length > 0) return p; }
-  } catch(e) {}
-  return null;
-}
-function saveData(data) { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
-function loadCustomCategories() {
-  try { const r = localStorage.getItem(LS_CAT_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return [];
-}
-function saveCustomCategories(c) { localStorage.setItem(LS_CAT_KEY, JSON.stringify(c)); }
-function loadIpadCustomCategories() {
-  try { const r = localStorage.getItem(LS_IPAD_CAT_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return [];
-}
-function saveIpadCustomCategories(c) { localStorage.setItem(LS_IPAD_CAT_KEY, JSON.stringify(c)); }
+  /* Grays */
+  --gray-50:   #fafafa;
+  --gray-100:  #f4f4f5;
+  --gray-200:  #e4e4e7;
+  --gray-300:  #d4d4d8;
+  --gray-500:  #71717a;
+  --gray-700:  #3f3f46;
+  --gray-900:  #18181b;
+  --white:     #ffffff;
 
-function initData() {
-  const stored = loadData();
-  repairs = stored || JSON.parse(JSON.stringify(DEFAULT_DATA));
-  if (!stored) saveData(repairs);
-  customCategories     = loadCustomCategories();
-  ipadCustomCategories = loadIpadCustomCategories();
+  --shadow:    0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
+  --shadow-lg: 0 4px 8px rgba(0,0,0,.08), 0 12px 28px rgba(0,0,0,.1);
+  --shadow-g:  0 2px 8px rgba(31,111,80,.1);
 }
 
-// -----------------------------------------------
-// STATE
-// -----------------------------------------------
-let repairs = [];
-let customCategories = [];
-let ipadCustomCategories = [];
-let activeCategory = 'all';
-let activeIpadSubCategory = 'all';
-let editingId = null;
-
-// -----------------------------------------------
-// BOOT LOADER  (premium, minimal)
-// -----------------------------------------------
-function runBoot() {
-  const loader = document.getElementById('bootLoader');
-  const line1  = document.getElementById('bootLine1');
-  const line2  = document.getElementById('bootLine2');
-  const orbEl  = document.getElementById('bootOrb');
-  if (!loader || !line1 || !line2) return;
-
-  // Sequence: blank (300ms) → line 1 fades in → line 2 fades in beneath → orb flies → fade out
-  setTimeout(() => {
-    line1.textContent = 'nxtlevel server initialized';
-    line1.classList.add('visible');
-  }, 600);
-
-  setTimeout(() => {
-    line2.textContent = 'connecting to developer device…';
-    line2.classList.add('visible');
-  }, 1900);
-
-  // Begin flight to corner at ~3.2s — text starts to fade
-  setTimeout(() => {
-    line1.classList.remove('visible');
-    line2.classList.remove('visible');
-  }, 3000);
-
-  setTimeout(() => {
-    if (orbEl) {
-      // Lock current position so the transition is geometrically smooth
-      const rect = orbEl.getBoundingClientRect();
-      orbEl.style.position = 'fixed';
-      orbEl.style.top  = rect.top + 'px';
-      orbEl.style.left = rect.left + 'px';
-      orbEl.style.margin = 0;
-      // Force reflow before adding the destination class
-      void orbEl.offsetWidth;
-      orbEl.classList.add('fly-to-corner');
-    }
-  }, 3200);
-
-  setTimeout(() => {
-    loader.classList.add('fade-out');
-    setTimeout(() => {
-      loader.style.display = 'none';
-      const realOrb = document.getElementById('ronOrb');
-      if (realOrb) realOrb.style.opacity = '1';
-    }, 850);
-  }, 4200);
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #f7faf8;
+  color: var(--gray-900);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-// -----------------------------------------------
-// INIT
-// -----------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
-  runBoot();
-  initData();
-  buildQuickGrid();
-  attachSearchListeners();
-  renderDynamicFilters();
-  renderDynamicIpadFilters();
-  populateBrandSelect();
-  renderAdminList();
-  updateAdminCount();
-  ronInit();
-});
+/* ---- HEADER ---- */
+.site-header {
+  background: var(--white);
+  border-bottom: 2px solid var(--green-border);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(31,111,80,.08);
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 20px;
+  height: 62px; display: flex; align-items: center;
+  justify-content: space-between; gap: 16px;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { font-size: 22px; }
+.logo-name { display: block; font-weight: 700; font-size: 15px; color: var(--gray-900); line-height: 1.2; }
+.logo-sub  { display: block; font-size: 11px; color: var(--gray-500); font-weight: 500; letter-spacing: .4px; text-transform: uppercase; }
 
-// -----------------------------------------------
-// VIEW SWITCHING
-// -----------------------------------------------
-function showView(view) {
-  document.getElementById('viewLookup').style.display = view === 'lookup' ? '' : 'none';
-  document.getElementById('viewAdmin').style.display  = view === 'admin'  ? '' : 'none';
-  document.getElementById('navLookup').classList.toggle('active', view === 'lookup');
-  document.getElementById('navAdmin').classList.toggle('active',  view === 'admin');
-  if (view === 'admin') { renderAdminList(); updateAdminCount(); }
+.header-nav { display: flex; gap: 6px; }
+.nav-btn {
+  padding: 7px 15px; border-radius: 8px;
+  border: 1px solid var(--gray-200); background: transparent;
+  font-size: 13px; font-weight: 500; color: var(--gray-700);
+  cursor: pointer; transition: all .18s; font-family: inherit;
+}
+.nav-btn:hover { background: var(--green-light); border-color: var(--green-border); color: var(--green-dark); }
+.nav-btn.active { background: var(--green-btn); color: var(--white); border-color: var(--green-btn); font-weight: 600; }
+
+/* ---- SEARCH SECTION ---- */
+.search-section {
+  background: linear-gradient(135deg, #06361E 0%, #0B4D2C 45%, #146C43 75%, #0B4D2C 100%);
+  padding: 48px 20px 36px;
+  position: relative;
+  overflow: hidden;
+}
+.search-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(255,255,255,.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+.search-inner { max-width: 760px; margin: 0 auto; }
+.search-heading {
+  font-size: clamp(24px, 4vw, 36px); font-weight: 700;
+  color: #fff; margin-bottom: 6px; letter-spacing: -.5px;
+}
+.search-sub { color: rgba(255,255,255,.85); font-size: 14px; margin-bottom: 20px; }
+
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-icon { position: absolute; left: 16px; font-size: 16px; pointer-events: none; }
+.search-input {
+  width: 100%; padding: 16px 48px 16px 46px;
+  border-radius: 12px; border: none; font-size: 16px; font-family: inherit;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18); outline: none;
+  transition: box-shadow .18s; background: var(--white); color: var(--gray-900);
+}
+.search-input:focus { box-shadow: 0 4px 20px rgba(0,0,0,.22), 0 0 0 3px rgba(255,255,255,.4); }
+.search-input::placeholder { color: var(--gray-500); }
+.search-clear {
+  position: absolute; right: 14px; background: none; border: none;
+  font-size: 14px; color: var(--gray-500); cursor: pointer;
+  padding: 4px; border-radius: 4px; display: none;
+}
+.search-clear:hover { background: var(--gray-100); color: var(--gray-900); }
+
+/* ---- FILTERS ---- */
+.filters { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+.filter-btn {
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.38);
+  background: rgba(255,255,255,.18); color: #fff;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .15s; white-space: nowrap; font-family: inherit;
+}
+.filter-btn:hover { background: rgba(255,255,255,.3); }
+.filter-btn.active { background: #fff; color: var(--green-dark); border-color: #fff; font-weight: 600; }
+
+/* ---- iPAD SUB-FILTER STRIP ---- */
+.ipad-subfilters {
+  background: var(--green-light);
+  border-bottom: 1px solid var(--green-border);
+}
+.ipad-subfilter-inner {
+  max-width: 760px; margin: 0 auto;
+  padding: 10px 20px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+}
+.ipad-sub-label {
+  font-size: 12px; font-weight: 700; color: var(--green-dark);
+  text-transform: uppercase; letter-spacing: .5px; margin-right: 4px;
+  white-space: nowrap;
+}
+.ipad-sub-btn {
+  padding: 5px 14px; border-radius: 16px;
+  border: 1px solid var(--green-border);
+  background: var(--white); color: var(--green-dark);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all .15s; white-space: nowrap; font-family: inherit;
+}
+.ipad-sub-btn:hover { background: var(--green-border); }
+.ipad-sub-btn.active { background: var(--green-btn); color: var(--white); border-color: var(--green-btn); font-weight: 600; }
+
+/* ---- MAIN CONTENT ---- */
+.main-content { max-width: 1100px; margin: 0 auto; padding: 32px 20px 48px; flex: 1; width: 100%; }
+
+/* ---- MOST USED ---- */
+.section-header { margin-bottom: 18px; }
+.section-title { font-size: 18px; font-weight: 700; color: var(--gray-900); }
+.section-sub   { font-size: 13px; color: var(--gray-500); margin-top: 3px; }
+
+.quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.quick-chip {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 12px 14px; cursor: pointer;
+  transition: all .18s; font-size: 13px; font-weight: 500; color: var(--gray-700);
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--shadow); font-family: inherit;
+}
+.quick-chip:hover {
+  border-color: var(--green-primary); color: var(--green-dark);
+  background: var(--green-light); transform: translateY(-2px); box-shadow: var(--shadow-lg);
+}
+.quick-chip-icon { font-size: 15px; flex-shrink: 0; }
+
+/* ---- RESULTS ---- */
+.results-meta { font-size: 13px; color: var(--gray-500); margin-bottom: 16px; font-weight: 500; }
+.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+/* ---- PRICE CARD ---- */
+.price-card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 12px; padding: 20px; box-shadow: var(--shadow);
+  transition: box-shadow .18s, transform .18s;
+  border-top: 3px solid var(--green-primary);
+}
+.price-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+.card-brand { font-size: 11px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--green-primary); margin-bottom: 4px; }
+.card-model  { font-size: 17px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; line-height: 1.3; }
+.card-type   { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; margin-bottom: 16px; }
+
+.type-lcd      { background: var(--green-light); color: var(--green-dark); }
+.type-digi     { background: #ecfdf5; color: #065f46; }
+.type-battery  { background: var(--status-green-bg); color: var(--status-green); }
+.type-charging { background: var(--purple-bg); color: var(--purple); }
+.type-camera   { background: var(--amber-bg); color: var(--amber); }
+.type-other    { background: var(--gray-100); color: var(--gray-700); }
+
+.card-prices { display: flex; gap: 10px; flex-wrap: wrap; }
+.price-pill {
+  flex: 1; min-width: 70px; background: var(--gray-50);
+  border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 12px; text-align: center;
+}
+.price-pill-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500); margin-bottom: 4px; }
+.price-pill-value { font-size: 17px; font-weight: 700; color: var(--gray-900); }
+
+.pill-np  { border-color: var(--green-border); background: var(--green-light); }
+.pill-np  .price-pill-label { color: var(--green-dark); }
+.pill-np  .price-pill-value { color: var(--green-dark); }
+.pill-min {
+  border-color: #15803d;
+  background: #15803d;
+  box-shadow: 0 2px 8px rgba(21,128,61,.35);
+  transform: scale(1.08);
+  position: relative;
+}
+.pill-min .price-pill-label { color: rgba(255,255,255,.85); }
+.pill-min .price-pill-value { color: #ffffff; font-size: 20px; }
+.pill-max { border-color: var(--teal-bd); background: var(--teal-bg); }
+.pill-max .price-pill-label { color: var(--teal); }
+.pill-max .price-pill-value { color: var(--teal); }
+
+.price-variable { font-size: 12px; color: var(--gray-500); margin-top: 8px; font-style: italic; }
+
+/* ---- NO RESULTS ---- */
+.no-results { text-align: center; padding: 64px 20px; color: var(--gray-500); }
+.no-results-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+.no-results h3 { font-size: 18px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+.no-results p  { font-size: 14px; }
+
+/* ======================================
+   ADMIN VIEW
+   ====================================== */
+.admin-wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px 60px; }
+.admin-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+.admin-title { font-size: 22px; font-weight: 700; color: var(--gray-900); }
+.admin-sub   { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
+.admin-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.btn-export, .btn-import, .btn-add-cat {
+  padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; transition: all .18s; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-export  { background: var(--status-green-bg); color: var(--status-green); }
+.btn-export:hover { background: var(--status-green-bd); }
+.btn-import  { background: var(--green-light); color: var(--green-dark); }
+.btn-import:hover { background: var(--green-border); }
+.btn-add-cat { background: var(--purple-bg); color: var(--purple); }
+.btn-add-cat:hover { background: #ddd6fe; }
+
+/* ---- MODAL ---- */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.35); z-index: 200;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--white); border-radius: 14px; padding: 28px 28px 24px;
+  width: 100%; max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
+.modal-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.modal-sub   { font-size: 13px; color: var(--gray-500); margin-bottom: 14px; }
+
+/* scope radio row */
+.modal-scope-row { display: flex; gap: 16px; margin-bottom: 10px; }
+.modal-scope-opt {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 500; color: var(--gray-700);
+  cursor: pointer; padding: 8px 14px; border-radius: 8px;
+  border: 1px solid var(--gray-200); flex: 1; transition: all .15s;
+}
+.modal-scope-opt:has(input:checked) { border-color: var(--green-primary); background: var(--green-light); color: var(--green-dark); }
+.modal-scope-opt input { accent-color: var(--green-primary); }
+.modal-scope-hint { font-size: 12px; color: var(--gray-500); margin-bottom: 14px; font-style: italic; min-height: 16px; }
+
+.modal-input {
+  width: 100%; padding: 11px 14px;
+  border: 1px solid var(--gray-300); border-radius: 8px;
+  font-size: 15px; font-family: inherit; outline: none;
+  transition: border-color .15s, box-shadow .15s; margin-bottom: 16px;
+}
+.modal-input:focus { border-color: var(--green-primary); box-shadow: 0 0 0 3px rgba(31,111,80,.15); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-confirm {
+  padding: 9px 20px; background: var(--green-btn); color: #fff;
+  border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background .15s;
+}
+.modal-confirm:hover { background: var(--green-btn-h); }
+.modal-cancel {
+  padding: 9px 16px; background: var(--gray-100); color: var(--gray-700);
+  border: 1px solid var(--gray-200); border-radius: 8px; font-size: 14px;
+  font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s;
+}
+.modal-cancel:hover { background: var(--gray-200); }
+.modal-error { font-size: 12px; color: var(--red); margin-top: -10px; margin-bottom: 10px; min-height: 16px; }
+
+/* ---- FORM CARD ---- */
+.form-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 24px; box-shadow: var(--shadow); margin-bottom: 28px; }
+.form-title { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 18px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 18px; }
+.form-group.full-width { grid-column: 1 / -1; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
+.form-group input,
+.form-group select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--gray-300); border-radius: 8px;
+  font-size: 14px; font-family: inherit; color: var(--gray-900); background: var(--white);
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.form-group input:focus,
+.form-group select:focus { border-color: var(--green-primary); box-shadow: 0 0 0 3px rgba(31,111,80,.15); }
+
+.label-tag { font-size: 10px; background: var(--green-light); color: var(--green-dark); padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; margin-left: 4px; }
+.label-hint { font-size: 10px; color: var(--gray-500); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+.form-actions { display: flex; gap: 10px; }
+.btn-save {
+  padding: 11px 22px; background: var(--green-btn); color: #fff;
+  border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .18s, transform .15s; font-family: inherit;
+}
+.btn-save:hover { background: var(--green-btn-h); transform: translateY(-1px); }
+.btn-cancel {
+  padding: 11px 18px; background: var(--gray-100); color: var(--gray-700);
+  border: 1px solid var(--gray-200); border-radius: 8px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .15s; font-family: inherit;
+}
+.btn-cancel:hover { background: var(--gray-200); }
+.form-error { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+/* ---- ADMIN LIST ---- */
+.admin-list-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.admin-search-input {
+  padding: 9px 14px; border: 1px solid var(--gray-300); border-radius: 8px;
+  font-size: 14px; font-family: inherit; width: 240px; outline: none;
+}
+.admin-search-input:focus { border-color: var(--green-primary); box-shadow: 0 0 0 3px rgba(31,111,80,.12); }
+
+.admin-list { display: flex; flex-direction: column; gap: 8px; }
+.admin-row {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; transition: border-color .15s, box-shadow .15s;
+}
+.admin-row:hover { border-color: var(--green-border); box-shadow: var(--shadow-g); }
+.admin-row-info { flex: 1; min-width: 0; }
+.admin-row-brand { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--green-primary); }
+.admin-row-model { font-size: 15px; font-weight: 600; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-row-meta  { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.admin-row-prices { display: flex; gap: 8px; flex-wrap: wrap; }
+.admin-price-tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; white-space: nowrap; }
+.tag-np  { background: var(--green-light); color: var(--green-dark); }
+.tag-min { background: #f0fdf4; color: var(--status-green); }
+.tag-max { background: var(--teal-bg); color: var(--teal); }
+
+.admin-row-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-edit {
+  padding: 7px 13px; background: var(--green-light); color: var(--green-dark);
+  border: none; border-radius: 7px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background .15s; font-family: inherit;
+}
+.btn-edit:hover { background: var(--green-border); }
+.btn-delete {
+  padding: 7px 13px; background: var(--red-bg); color: var(--red);
+  border: none; border-radius: 7px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background .15s; font-family: inherit;
+}
+.btn-delete:hover { background: #fecaca; }
+
+/* ---- TOAST ---- */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--gray-900); color: #fff;
+  padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 999; animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ---- FOOTER ---- */
+.site-footer {
+  text-align: center; padding: 18px; font-size: 12px; color: var(--gray-500);
+  border-top: 1px solid var(--gray-200); background: var(--white); margin-top: auto;
 }
 
-// -----------------------------------------------
-// QUICK GRID
-// -----------------------------------------------
-function buildQuickGrid() {
-  const grid = document.getElementById('quickGrid');
-  grid.innerHTML = QUICK_REPAIRS.map(q => `
-    <button class="quick-chip" onclick="quickSearch('${q.searchFor}')">
-      <span class="quick-chip-icon">${q.icon}</span>${q.label}
-    </button>`).join('');
+/* ---- RESPONSIVE ---- */
+@media (max-width: 640px) {
+  .header-inner { height: auto; padding: 10px 16px; flex-wrap: wrap; }
+  .search-section { padding: 28px 16px 24px; }
+  .main-content { padding: 20px 16px 40px; }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+  .results-grid { grid-template-columns: 1fr; }
+  .admin-wrap { padding: 20px 16px 48px; }
+  .admin-header { flex-direction: column; }
+  .form-grid { grid-template-columns: 1fr; }
+  .admin-row { flex-wrap: wrap; }
+  .admin-search-input { width: 100%; }
+  .admin-list-header { flex-direction: column; align-items: flex-start; }
+  .modal-box { margin: 16px; }
+  .modal-scope-row { flex-direction: column; }
+  .ipad-subfilter-inner { padding: 8px 16px; }
 }
 
-function quickSearch(term) {
-  document.getElementById('searchInput').value = term;
-  activeCategory = 'all';
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'all'));
-  runSearch(term);
+/* ======================================
+   BOOT LOADER — minimal, black, premium
+   ====================================== */
+#bootLoader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #000000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .8s ease;
+}
+#bootLoader.fade-out { opacity: 0; pointer-events: none; }
+.boot-inner { text-align: center; }
+.boot-orb {
+  width: 180px; height: 180px;
+  margin: 0 auto 32px;
+  animation: bootOrbFloat 4.5s ease-in-out infinite;
+  transition: transform 1.1s cubic-bezier(.55,.06,.24,.99),
+              width 1.1s cubic-bezier(.55,.06,.24,.99),
+              height 1.1s cubic-bezier(.55,.06,.24,.99),
+              margin 1.1s cubic-bezier(.55,.06,.24,.99);
+  will-change: transform, width, height;
+}
+@keyframes bootOrbFloat {
+  0%,100% { transform: translateY(0) scale(1);    }
+  50%      { transform: translateY(-10px) scale(1.025); }
 }
 
-// -----------------------------------------------
-// DYNAMIC FILTERS
-// -----------------------------------------------
-function renderDynamicFilters() {
-  document.getElementById('dynamicFilters').innerHTML = customCategories.map(cat =>
-    `<button class="filter-btn" data-cat="${cat}" onclick="setFilter(this,'${cat}')">${cat}</button>`
-  ).join('');
+/* Boot text — two lines, each fades cleanly */
+.boot-msg-stack { display: flex; flex-direction: column; gap: 6px; min-height: 44px; }
+.boot-line {
+  font-family:'Inter',sans-serif;
+  font-size: 15px; font-weight: 500;
+  color: #7dffb4; letter-spacing: .6px;
+  opacity: 0;
+  transition: opacity .6s ease;
+  min-height: 20px;
+}
+.boot-line.visible { opacity: 1; }
+.boot-line-sub { color: #4eb87f; font-size: 13px; font-weight: 400; }
+
+/* Boot → corner fly */
+#bootOrb.fly-to-corner {
+  position: fixed !important;
+  top: auto !important;
+  bottom: 24px;
+  left: 24px;
+  width: 62px; height: 62px;
+  margin: 0;
+  transform: translateY(0) scale(1);
+  animation: none;
+}
+@media (max-width: 640px) {
+  #bootOrb.fly-to-corner { left: 16px; bottom: 16px; }
 }
 
-function setFilter(btn, cat) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeCategory = cat;
-  const sub = document.getElementById('ipadSubfilters');
-  if (cat === 'iPad') {
-    sub.style.display = '';
-    activeIpadSubCategory = 'all';
-    document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.icat === 'all'));
-  } else {
-    sub.style.display = 'none';
-    activeIpadSubCategory = 'all';
-  }
-  runSearch(document.getElementById('searchInput').value);
+/* ======================================
+   PLASMA ORB SHARED ANIMATIONS
+   (boot orb + RON orb both use these)
+   ====================================== */
+
+/* Plasma layer A — broad, slow, gentle breathing rotation */
+.plasma-a {
+  transform-origin: 100px 100px;
+  animation: plasmaABreathe 7s ease-in-out infinite;
+}
+@keyframes plasmaABreathe {
+  0%,100% { transform: rotate(0deg)   scale(1);    opacity: .9; }
+  50%      { transform: rotate(180deg) scale(1.08); opacity: 1;  }
 }
 
-function setIpadSubFilter(btn, icat) {
-  document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeIpadSubCategory = icat;
-  runSearch(document.getElementById('searchInput').value);
+/* Plasma layer B — hot core, faster, drifts off-center */
+.plasma-b {
+  transform-origin: 100px 100px;
+  animation: plasmaBSwirl 4.2s ease-in-out infinite;
+}
+@keyframes plasmaBSwirl {
+  0%   { transform: rotate(0deg)   translate(-4px,2px) scale(1);    }
+  33%  { transform: rotate(120deg) translate(6px,-3px) scale(1.06); }
+  66%  { transform: rotate(240deg) translate(-3px,5px) scale(.95);  }
+  100% { transform: rotate(360deg) translate(-4px,2px) scale(1);    }
 }
 
-function renderDynamicIpadFilters() {
-  document.getElementById('dynamicIpadFilters').innerHTML = ipadCustomCategories.map(cat =>
-    `<button class="ipad-sub-btn" data-icat="${cat}" onclick="setIpadSubFilter(this,'${cat}')">${cat}</button>`
-  ).join('');
+/* Energy arcs — stroke-dashoffset flow, no jagged zigzags */
+.arc {
+  animation-name: arcFlow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.arc-1 { animation-duration: 4.5s; }
+.arc-2 { animation-duration: 5.8s; animation-direction: reverse; }
+.arc-3 { animation-duration: 6.6s; }
+@keyframes arcFlow {
+  from { stroke-dashoffset: 0;    }
+  to   { stroke-dashoffset: -280; }
 }
 
-// -----------------------------------------------
-// SEARCH  (CHANGE 1 — precision fix)
-// -----------------------------------------------
-function attachSearchListeners() {
-  const input    = document.getElementById('searchInput');
-  const clearBtn = document.getElementById('clearBtn');
-
-  input.addEventListener('input', () => {
-    clearBtn.style.display = input.value ? 'block' : 'none';
-    runSearch(input.value);
-  });
-  clearBtn.addEventListener('click', () => {
-    input.value = '';
-    clearBtn.style.display = 'none';
-    showHomepage();
-    input.focus();
-  });
-  document.querySelectorAll('#filters .filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = btn.dataset.cat;
-      const sub = document.getElementById('ipadSubfilters');
-      if (activeCategory === 'iPad') {
-        sub.style.display = '';
-        activeIpadSubCategory = 'all';
-        document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.icat === 'all'));
-      } else {
-        sub.style.display = 'none';
-        activeIpadSubCategory = 'all';
-      }
-      runSearch(input.value);
-    });
-  });
-  document.querySelectorAll('.ipad-sub-btn').forEach(btn => {
-    btn.addEventListener('click', () => setIpadSubFilter(btn, btn.dataset.icat));
-  });
+/* Subtle arc-group breathing — they fade and brighten as a whole */
+.arc-group {
+  animation: arcsPulse 3.6s ease-in-out infinite;
+  transform-origin: 100px 100px;
+}
+@keyframes arcsPulse {
+  0%,100% { opacity: 0.55; }
+  50%      { opacity: 1;    }
 }
 
-function normalize(str) {
-  return (str || '').toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9 ]/g,'').trim();
+/* Floating particles — each one drifts independently */
+.particles circle {
+  animation-name: particleDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  transform-origin: center;
+}
+.pa { animation-duration: 5.5s; animation-delay: 0s;    }
+.pb { animation-duration: 6.8s; animation-delay: -1.2s; }
+.pc { animation-duration: 5.2s; animation-delay: -2.5s; }
+.pd { animation-duration: 7.4s; animation-delay: -0.8s; }
+.pe { animation-duration: 6.1s; animation-delay: -3.0s; }
+.pf { animation-duration: 5.9s; animation-delay: -1.7s; }
+.pg { animation-duration: 4.8s; animation-delay: -0.4s; }
+.ph { animation-duration: 6.3s; animation-delay: -2.2s; }
+@keyframes particleDrift {
+  0%   { transform: translate(0,0)         scale(1);   opacity: .35; }
+  25%  { transform: translate(3px,-5px)    scale(1.3); opacity: 1;   }
+  50%  { transform: translate(-2px,-8px)   scale(.9);  opacity: .6;  }
+  75%  { transform: translate(-5px,-3px)   scale(1.2); opacity: .9;  }
+  100% { transform: translate(0,0)         scale(1);   opacity: .35; }
 }
 
-// Alias table: casual shorthand → canonical form
-const ALIASES = [
-  [/\b(\d{2})\s*pm\b/g,        '$1 pro max'],
-  [/\b(\d{2})\s*p\b/g,         '$1 pro'],
-  [/\b(\d{2})[+]\b/g,          '$1 plus'],
-  [/\bip\b/g,                   'iphone'],
-  [/\biphone\s*/g,              'iphone '],
-  [/\bsamsung\s*/g,             'samsung '],
-  [/\bgalaxy\s*/g,              'samsung '],
-  [/\bmoto\s*/g,                'motorola '],
-  [/\bpixel\s*/g,               'pixel '],
-  [/\bdigi\b/g,                 'digitizer'],
-  [/\bscreen\b/g,               'lcd'],
-  [/\bdisplay\b/g,              'lcd'],
-  [/\bcharge port\b/g,          'charging port'],
-  [/\bcharger port\b/g,         'charging port'],
-  [/\bcharge\b/g,               'charging'],
-  [/\bcam\b/g,                  'camera'],
-  [/\bfix\b/g,                  ''],
-  [/\bhow much (to|for)\b/g,    ''],
-  [/\bprice\b/g,                ''],
-  [/\bcost\b/g,                 ''],
-];
+/* ======================================
+   RON ORB
+   ====================================== */
+#ronOrb {
+  position: fixed; bottom: 24px; left: 24px; z-index: 1000;
+  width: 62px; height: 62px; cursor: pointer;
+  animation: ronFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(0,255,120,.5));
+  transition: filter .3s ease, transform .25s ease, opacity .5s ease;
+  user-select: none;
+  opacity: 0;
+}
+#ronOrb:hover {
+  filter: drop-shadow(0 0 22px rgba(0,255,120,.85));
+  transform: scale(1.08);
+}
+#ronOrbSvg { width: 100%; height: 100%; }
 
-function expandAliases(q) {
-  let s = q.toLowerCase();
-  ALIASES.forEach(([re, rep]) => { s = s.replace(re, rep); });
-  return s.replace(/\s+/g,' ').trim();
+@keyframes ronFloat {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes ronPulse {
+  0%,100% { filter: drop-shadow(0 0 10px rgba(0,255,120,.35)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(0,255,120,.75)); }
+}
+@keyframes ronBounce {
+  0%,100% { transform: translateY(0); }
+  30%      { transform: translateY(-12px); }
+  60%      { transform: translateY(-5px); }
+}
+@keyframes ronWobble {
+  0%,100% { transform: rotate(0deg); }
+  20%      { transform: rotate(-6deg); }
+  40%      { transform: rotate(6deg); }
+  60%      { transform: rotate(-4deg); }
+  80%      { transform: rotate(3deg); }
+}
+@keyframes ronShake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-5px); }
+  40%      { transform: translateX(5px); }
+  60%      { transform: translateX(-3px); }
+  80%      { transform: translateX(3px); }
+}
+@keyframes ronSleep {
+  0%,100% { transform: translateY(0) scale(1); opacity:1; }
+  50%      { transform: translateY(3px) scale(.97); opacity:.75; }
 }
 
-// ---- PRECISION SEARCH: prevent "iPhone 11" matching "iPhone 12", "13", etc. ----
-// Extract a model number token if present (e.g. "11", "13", "8a", "s23", "a15")
-function extractModelNumber(q) {
-  // Match patterns like: 11, 13, 15, 8a, s23, a15, 7a, 9a, 9 pro, etc.
-  const m = q.match(/\b(s\d+|a\d+|\d+[a-z]?)\b/i);
-  return m ? m[1].toLowerCase() : null;
+#ronOrb.mood-thinking { animation: ronPulse 0.8s ease-in-out infinite; }
+#ronOrb.mood-happy    { animation: ronBounce 0.6s ease; }
+#ronOrb.mood-confused { animation: ronWobble 0.7s ease; }
+#ronOrb.mood-annoyed  { animation: ronShake 0.5s ease; }
+#ronOrb.mood-sleeping { animation: ronSleep 2.5s ease-in-out infinite; }
+
+/* RON speech bubble */
+.ron-bubble {
+  position: absolute;
+  bottom: 70px; left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #1a4a2e;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 500;
+  padding: 7px 13px;
+  border-radius: 14px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  border: 1px solid #b7dfd0;
+  pointer-events: none;
+  animation: bubblePop .25s ease;
+  z-index: 1001;
+}
+.ron-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #fff;
+  border-bottom: none;
+}
+@keyframes bubblePop {
+  from { opacity:0; transform: translateX(-50%) scale(.85); }
+  to   { opacity:1; transform: translateX(-50%) scale(1); }
 }
 
-function modelNumberMatches(entry, queryModelNum) {
-  if (!queryModelNum) return true; // no number constraint — let everything through
-  const haystack = normalize(entry.model) + ' ' + (entry.keywords || []).map(normalize).join(' ');
+/* ======================================
+   RON CHAT PANEL
+   ====================================== */
+.ron-panel {
+  position: fixed;
+  bottom: 98px; left: 24px;
+  width: 320px; max-height: 480px;
+  background: #fff;
+  border: 1px solid #b7dfd0;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+  display: flex; flex-direction: column;
+  z-index: 1000;
+  overflow: hidden;
+  animation: panelSlideUp .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes panelSlideUp {
+  from { opacity:0; transform: translateY(20px) scale(.97); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.ron-panel-header {
+  background: linear-gradient(135deg,#0a3d22,#1a6e40);
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ron-header-left { display: flex; align-items: center; gap: 10px; }
+.ron-header-orb  { width: 36px; height: 36px; flex-shrink: 0; }
+.ron-header-name { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: .5px; }
+.ron-header-status { font-size: 11px; color: #7dffb4; font-weight: 500; }
+.ron-close {
+  background: rgba(255,255,255,.15); border: none; color: #fff;
+  width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.ron-close:hover { background: rgba(255,255,255,.3); }
 
-  // If query has a prefixed token like 'a15' or 's23', match it exactly
-  if (/^[sa]\d+/i.test(queryModelNum)) {
-    const re = new RegExp('\\b' + queryModelNum.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
-    return re.test(haystack);
-  }
-
-  // Otherwise it's a bare number like '11', '13'. Match either bare ('iphone 11')
-  // or check if entry's brand context implies the same number lineage.
-  const bareRe = new RegExp('\\b' + queryModelNum.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
-  return bareRe.test(haystack);
+.ron-messages {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  scrollbar-width: thin; scrollbar-color: #b7dfd0 transparent;
 }
 
-function matchScore(entry, query) {
-  if (!query) return 0;
-  const expanded  = expandAliases(query);
-  const q         = normalize(expanded);
-  const model     = normalize(entry.model);
-  const brand     = normalize(entry.brand);
-  const type      = normalize(entry.repairType);
-  const combined  = `${brand} ${model} ${type}`;
-  const keywords  = (entry.keywords || []).map(normalize);
+/* message bubbles */
+.ron-msg { display: flex; align-items: flex-end; gap: 7px; }
+.ron-msg.ron  { flex-direction: row; }
+.ron-msg.user { flex-direction: row-reverse; }
 
-  // --- PRECISION GATE ---
-  // If the query contains a model number, ONLY entries whose model also contains that exact number pass
-  const queryModelNum = extractModelNumber(q);
-  if (queryModelNum && !modelNumberMatches(entry, queryModelNum)) return 0;
+.ron-msg-avatar {
+  width: 28px; height: 28px; flex-shrink: 0;
+}
+.ron-msg-avatar svg { width: 100%; height: 100%; }
 
-  if (combined === q) return 100;
-  if (combined.includes(q)) return 80;
-  if (model.includes(q)) return 75;
-  if (keywords.some(k => k === q)) return 90;
-  if (keywords.some(k => k.includes(q))) return 70;
+.ron-msg-bubble {
+  max-width: 82%;
+  padding: 9px 13px;
+  border-radius: 16px;
+  font-size: 13px; line-height: 1.45;
+  font-family: 'Inter', sans-serif;
+}
+.ron-msg.ron  .ron-msg-bubble { background: #eaf6f0; color: #0f3d22; border-bottom-left-radius: 4px; }
+.ron-msg.user .ron-msg-bubble { background: #1F6F50; color: #fff; border-bottom-right-radius: 4px; }
 
-  const tokens   = q.split(' ').filter(Boolean);
-  const allMatch = tokens.every(t => combined.includes(t) || keywords.some(k => k.includes(t)));
-  if (allMatch) return 60;
+/* RON price card inside chat */
+.ron-price-card {
+  background: #fff;
+  border: 1px solid #b7dfd0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 6px;
+  border-top: 3px solid #1F6F50;
+}
+.ron-card-brand { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: #1F6F50; }
+.ron-card-model { font-size: 14px; font-weight: 700; color: #0f3d22; margin: 2px 0 6px; }
+.ron-card-type  { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-bottom: 10px; background: #eaf6f0; color: #1a5c35; }
+.ron-card-prices { display: flex; gap: 7px; }
+.ron-card-pill {
+  flex: 1; border-radius: 8px; padding: 7px 8px; text-align: center;
+  border: 1px solid #e4e4e7;
+}
+.ron-card-pill-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: #71717a; margin-bottom: 3px; }
+.ron-card-pill-value { font-size: 15px; font-weight: 700; color: #0f3d22; }
+.ron-card-pill.p-min { background: #15803d; border-color: #15803d; }
+.ron-card-pill.p-min .ron-card-pill-label { color: rgba(255,255,255,.8); }
+.ron-card-pill.p-min .ron-card-pill-value { color: #fff; }
+.ron-card-pill.p-np  { background: #eaf6f0; border-color: #b7dfd0; }
+.ron-card-pill.p-np  .ron-card-pill-value { color: #1F6F50; }
+.ron-card-pill.p-max { background: #ecfeff; border-color: #a5f3fc; }
+.ron-card-pill.p-max .ron-card-pill-value { color: #0e7490; }
 
-  const partial = tokens.filter(t => combined.includes(t) || keywords.some(k => k.includes(t)));
-  if (partial.length >= Math.ceil(tokens.length / 2)) return 30;
-  return 0;
+/* suggestion chips inside RON */
+.ron-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ron-chip {
+  background: #eaf6f0; color: #1F6F50;
+  border: 1px solid #b7dfd0; border-radius: 20px;
+  padding: 4px 12px; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
+}
+.ron-chip:hover { background: #1F6F50; color: #fff; }
+
+/* thinking dots */
+.ron-thinking { display: flex; gap: 4px; padding: 4px 2px; }
+.ron-thinking span {
+  width: 7px; height: 7px; border-radius: 50%; background: #1F6F50;
+  animation: ronDot 1.2s ease-in-out infinite;
+}
+.ron-thinking span:nth-child(2) { animation-delay: .2s; }
+.ron-thinking span:nth-child(3) { animation-delay: .4s; }
+@keyframes ronDot {
+  0%,80%,100% { transform: scale(.7); opacity:.4; }
+  40%          { transform: scale(1.1); opacity:1; }
 }
 
-const STATIC_CATS = ['iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera'];
-
-function getRepairCategory(entry) {
-  const type = (entry.repairType || '').toLowerCase();
-  if (type === 'lcd' || type === 'digitizer') return entry.brand;
-  if (type === 'battery') return 'Battery';
-  if (type === 'charging port') return 'Charging Port';
-  if (type === 'camera') return 'Camera';
-  return entry.brand || 'Other';
+/* RON input */
+.ron-input-row {
+  display: flex; gap: 8px; padding: 10px 14px;
+  border-top: 1px solid #e4e4e7;
+  background: #fff;
 }
-
-function runSearch(query) {
-  const q = query.trim();
-  if (!q && activeCategory === 'all') { showHomepage(); return; }
-
-  document.getElementById('mostUsed').style.display = 'none';
-  document.getElementById('resultsSection').style.display = '';
-
-  let results = repairs.map(entry => ({ entry, score: matchScore(entry, q) }));
-
-  if (activeCategory !== 'all') {
-    results = results.filter(({ entry }) => {
-      const cat = getRepairCategory(entry);
-      if (activeCategory === 'Other') return !STATIC_CATS.includes(cat) && !customCategories.includes(cat);
-      return cat === activeCategory;
-    });
-    if (!q) results.forEach(r => r.score = 1);
-  }
-
-  if (activeCategory === 'iPad' && activeIpadSubCategory !== 'all') {
-    results = results.filter(({ entry }) =>
-      (entry.repairType || '').toLowerCase() === activeIpadSubCategory.toLowerCase()
-    );
-  }
-
-  results = results.filter(r => r.score > 0).sort((a,b) => b.score - a.score);
-
-  const grid = document.getElementById('resultsGrid');
-  const meta = document.getElementById('resultsMeta');
-
-  if (results.length === 0) {
-    document.getElementById('resultsSection').style.display = 'none';
-    document.getElementById('noResults').style.display = '';
-  } else {
-    document.getElementById('noResults').style.display = 'none';
-    meta.textContent = `${results.length} result${results.length !== 1 ? 's' : ''} found`;
-    grid.innerHTML = results.map(r => renderCard(r.entry)).join('');
-  }
+.ron-input {
+  flex: 1; padding: 9px 12px;
+  border: 1px solid #d4d4d8; border-radius: 20px;
+  font-size: 13px; font-family: 'Inter', sans-serif;
+  outline: none; transition: border-color .15s;
+  color: #18181b;
 }
-
-function showHomepage() {
-  document.getElementById('mostUsed').style.display = '';
-  document.getElementById('resultsSection').style.display = 'none';
-  document.getElementById('noResults').style.display = 'none';
+.ron-input:focus { border-color: #1F6F50; box-shadow: 0 0 0 3px rgba(31,111,80,.12); }
+.ron-send {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #1F6F50; color: #fff; border: none;
+  font-size: 16px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, transform .15s;
 }
+.ron-send:hover { background: #175640; transform: scale(1.05); }
 
-// -----------------------------------------------
-// RENDER CARD
-// -----------------------------------------------
-function typeClass(t) {
-  t = (t||'').toLowerCase();
-  if (t==='lcd')           return 'type-lcd';
-  if (t==='digitizer')     return 'type-digi';
-  if (t==='battery')       return 'type-battery';
-  if (t==='charging port') return 'type-charging';
-  if (t==='camera')        return 'type-camera';
-  return 'type-other';
-}
-function fmt(val) {
-  if (val == null || val === '') return null;
-  return '$' + Number(val).toLocaleString();
-}
-function renderCard(entry) {
-  const isLCD = entry.repairType === 'LCD';
-  const npStr  = fmt(entry.nonProfit);
-  const minStr = fmt(entry.minimum);
-  const maxStr = fmt(entry.maximum);
-  let pills = '';
-  if (isLCD && npStr) pills += `<div class="price-pill pill-np"><div class="price-pill-label">Non-Profit</div><div class="price-pill-value">${npStr}</div></div>`;
-  if (minStr)          pills += `<div class="price-pill pill-min"><div class="price-pill-label">Minimum</div><div class="price-pill-value">${minStr}</div></div>`;
-  if (maxStr)          pills += `<div class="price-pill pill-max"><div class="price-pill-label">Maximum</div><div class="price-pill-value">${maxStr}</div></div>`;
-  const note = (!maxStr && minStr) ? '<p class="price-variable">Max price varies — quote based on parts availability.</p>' : '';
-  return `<div class="price-card">
-    <div class="card-brand">${entry.brand}</div>
-    <div class="card-model">${entry.model}</div>
-    <span class="card-type ${typeClass(entry.repairType)}">${entry.repairType}</span>
-    <div class="card-prices">${pills}</div>${note}
-  </div>`;
-}
-
-// -----------------------------------------------
-// ADMIN FORM
-// -----------------------------------------------
-function handleRepairTypeChange() {
-  const type = document.getElementById('fRepairType').value;
-  const npGroup = document.getElementById('npGroup');
-  document.getElementById('fNonProfit').value = '';
-  npGroup.style.display = type === 'LCD' ? '' : 'none';
-}
-function populateBrandSelect() {
-  const sel = document.getElementById('fBrand');
-  while (sel.options.length > 6) sel.remove(6);
-  customCategories.forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat; opt.textContent = cat;
-    sel.appendChild(opt);
-  });
-}
-function genId() { return 'u' + Date.now() + Math.random().toString(36).slice(2,6); }
-
-function saveEntry() {
-  const brand      = document.getElementById('fBrand').value.trim();
-  const model      = document.getElementById('fModel').value.trim();
-  const repairType = document.getElementById('fRepairType').value.trim();
-  const nonProfit  = document.getElementById('fNonProfit').value;
-  const minimum    = document.getElementById('fMin').value;
-  const maximum    = document.getElementById('fMax').value;
-  const kwRaw      = document.getElementById('fKeywords').value;
-  const errEl      = document.getElementById('formError');
-  errEl.textContent = '';
-  if (!brand || !model || !repairType) { errEl.textContent = 'Brand, Model, and Repair Type are required.'; return; }
-  if (!minimum) { errEl.textContent = 'Minimum Price is required.'; return; }
-  const keywords = kwRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-  const entry = {
-    id: editingId || genId(), brand, model, repairType,
-    nonProfit: repairType === 'LCD' && nonProfit ? parseFloat(nonProfit) : null,
-    minimum: parseFloat(minimum),
-    maximum: maximum ? parseFloat(maximum) : null,
-    keywords,
-  };
-  if (editingId) {
-    const idx = repairs.findIndex(r => r.id === editingId);
-    if (idx !== -1) repairs[idx] = entry;
-  } else { repairs.push(entry); }
-  saveData(repairs);
-  resetForm();
-  renderAdminList();
-  updateAdminCount();
-  toast(editingId ? '✅ Repair updated!' : '✅ New repair added!');
-  editingId = null;
-}
-function resetForm() {
-  ['fBrand','fModel','fRepairType','fNonProfit','fMin','fMax','fKeywords'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('npGroup').style.display = 'none';
-  document.getElementById('formTitle').textContent = '➕ Add New Repair';
-  document.getElementById('cancelEditBtn').style.display = 'none';
-  document.getElementById('formError').textContent = '';
-  editingId = null;
-}
-function cancelEdit() { resetForm(); }
-function editEntry(id) {
-  const entry = repairs.find(r => r.id === id);
-  if (!entry) return;
-  editingId = id;
-  document.getElementById('fBrand').value      = entry.brand || '';
-  document.getElementById('fModel').value      = entry.model || '';
-  document.getElementById('fRepairType').value = entry.repairType || '';
-  document.getElementById('fNonProfit').value  = entry.nonProfit || '';
-  document.getElementById('fMin').value        = entry.minimum || '';
-  document.getElementById('fMax').value        = entry.maximum || '';
-  document.getElementById('fKeywords').value   = (entry.keywords||[]).join(', ');
-  handleRepairTypeChange();
-  document.getElementById('formTitle').textContent = '✏️ Edit Repair';
-  document.getElementById('cancelEditBtn').style.display = '';
-  document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-function deleteEntry(id) {
-  const entry = repairs.find(r => r.id === id);
-  if (!entry) return;
-  if (!confirm(`Delete "${entry.model} — ${entry.repairType}"?\n\nThis cannot be undone.`)) return;
-  repairs = repairs.filter(r => r.id !== id);
-  saveData(repairs);
-  renderAdminList();
-  updateAdminCount();
-  toast('🗑️ Entry deleted.');
-}
-
-// -----------------------------------------------
-// ADMIN LIST
-// -----------------------------------------------
-function renderAdminList() {
-  const q = normalize(document.getElementById('adminSearch').value);
-  const list = document.getElementById('adminList');
-  const filtered = q
-    ? repairs.filter(r => normalize(r.brand+' '+r.model+' '+r.repairType).includes(q))
-    : repairs;
-  if (filtered.length === 0) {
-    list.innerHTML = '<p style="color:var(--gray-500);font-size:14px;padding:20px 0;">No entries match.</p>';
-    return;
-  }
-  list.innerHTML = filtered.map(entry => {
-    const npStr  = entry.repairType==='LCD' && entry.nonProfit ? `<span class="admin-price-tag tag-np">NP $${entry.nonProfit}</span>` : '';
-    const minStr = entry.minimum ? `<span class="admin-price-tag tag-min">Min $${entry.minimum}</span>` : '';
-    const maxStr = entry.maximum ? `<span class="admin-price-tag tag-max">Max $${entry.maximum}</span>` : '';
-    return `<div class="admin-row">
-      <div class="admin-row-info">
-        <div class="admin-row-brand">${entry.brand}</div>
-        <div class="admin-row-model">${entry.model}</div>
-        <div class="admin-row-meta">${entry.repairType}</div>
-      </div>
-      <div class="admin-row-prices">${npStr}${minStr}${maxStr}</div>
-      <div class="admin-row-btns">
-        <button class="btn-edit"   onclick="editEntry('${entry.id}')">✏️ Edit</button>
-        <button class="btn-delete" onclick="deleteEntry('${entry.id}')">🗑️ Delete</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-function updateAdminCount() { document.getElementById('adminCount').textContent = repairs.length; }
-
-// -----------------------------------------------
-// ADD CATEGORY MODAL
-// -----------------------------------------------
-function openAddCategoryModal() {
-  document.getElementById('catName').value = '';
-  document.getElementById('catError').textContent = '';
-  document.querySelector('input[name="catScope"][value="global"]').checked = true;
-  updateCatScopeHint();
-  document.getElementById('catModal').classList.add('open');
-  setTimeout(() => document.getElementById('catName').focus(), 100);
-}
-function closeCatModal() { document.getElementById('catModal').classList.remove('open'); }
-function closeCatModalOutside(e) { if (e.target===document.getElementById('catModal')) closeCatModal(); }
-function updateCatScopeHint() {
-  const scope = document.querySelector('input[name="catScope"]:checked').value;
-  const hint  = document.getElementById('catScopeHint');
-  if (scope==='ipad') {
-    hint.textContent = 'Appears as a sub-filter under iPad (e.g. Battery, Camera, Face ID, Speaker).';
-    document.getElementById('catName').placeholder = 'e.g. Battery, Camera, Face ID, Speaker…';
-  } else {
-    hint.textContent = 'Appears as a top-level filter and Brand option (e.g. iWatch, MacBook).';
-    document.getElementById('catName').placeholder = 'e.g. iWatch, MacBook, Google Pixel Parts…';
-  }
-}
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('catName').addEventListener('keydown', e => {
-    if (e.key==='Enter') saveCategory();
-    if (e.key==='Escape') closeCatModal();
-  });
-});
-function saveCategory() {
-  const name  = document.getElementById('catName').value.trim();
-  const scope = document.querySelector('input[name="catScope"]:checked').value;
-  const errEl = document.getElementById('catError');
-  errEl.textContent = '';
-  if (!name) { errEl.textContent = 'Please enter a category name.'; return; }
-  if (scope==='ipad') {
-    const existing = ['all','LCD','Digitizer',...ipadCustomCategories];
-    if (existing.map(c=>c.toLowerCase()).includes(name.toLowerCase())) { errEl.textContent='That iPad category already exists.'; return; }
-    ipadCustomCategories.push(name);
-    saveIpadCustomCategories(ipadCustomCategories);
-    renderDynamicIpadFilters();
-    closeCatModal();
-    toast(`✅ iPad category "${name}" added!`);
-  } else {
-    const allExisting = ['all','iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera','Other',...customCategories];
-    if (allExisting.map(c=>c.toLowerCase()).includes(name.toLowerCase())) { errEl.textContent='That category already exists.'; return; }
-    customCategories.push(name);
-    saveCustomCategories(customCategories);
-    renderDynamicFilters();
-    populateBrandSelect();
-    closeCatModal();
-    toast(`✅ Category "${name}" added!`);
-  }
-}
-
-// -----------------------------------------------
-// EXPORT / IMPORT
-// -----------------------------------------------
-function exportData() {
-  const payload = { repairs, customCategories, ipadCustomCategories };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url;
-  a.download = 'repair-prices-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('📥 Backup downloaded!');
-}
-function importData(event) {
-  const file = event.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      let nr, nc, ni;
-      if (Array.isArray(parsed)) { nr=parsed; nc=[]; ni=[]; }
-      else if (parsed.repairs && Array.isArray(parsed.repairs)) { nr=parsed.repairs; nc=parsed.customCategories||[]; ni=parsed.ipadCustomCategories||[]; }
-      else throw new Error();
-      if (!confirm(`Import ${nr.length} repair entries?\n\nThis will REPLACE your current data.`)) return;
-      repairs=nr; customCategories=nc; ipadCustomCategories=ni;
-      saveData(repairs); saveCustomCategories(customCategories); saveIpadCustomCategories(ipadCustomCategories);
-      renderAdminList(); updateAdminCount(); renderDynamicFilters(); renderDynamicIpadFilters(); populateBrandSelect();
-      toast(`✅ Imported ${nr.length} entries!`);
-    } catch { alert('Import failed — invalid file.'); }
-    event.target.value = '';
-  };
-  reader.readAsText(file);
-}
-
-// -----------------------------------------------
-// TOAST
-// -----------------------------------------------
-function toast(msg) {
-  const el = document.createElement('div');
-  el.className = 'toast'; el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
-}
-
-// ===============================================
-// RON — AI ORB ASSISTANT
-// ===============================================
-
-// --- Idle speech bubbles ---
-const RON_IDLE_BUBBLES = [
-  'Need my help?',
-  'I know every repair price.',
-  'Still searching manually?',
-  'Click me.',
-  'I\'ll make this faster.',
-  'RON is online.',
-  'Hey... over here.',
-  'Ask me anything.',
-  'I can find any price.',
-  'I\'m still here...',
-];
-
-// --- Personality responses ---
-const RON_GREETINGS = [
-  "Hey, I'm RON. Your personal repair assistant. What repair price can I help you with?"
-];
-
-// --- Idle bubbles (20–45s interval) ---
-const RON_IDLE_BUBBLES_V2 = [
-  'Need a price?',
-  "I'll help.",
-  'Still searching manually?',
-  'Ask me.',
-];
-
-// --- Unrelated topic guard ---
-const UNRELATED_KEYWORDS = [
-  'weather','joke','movie','politics','election','president','ronaldo','messi',
-  'football','soccer','basketball','programming','code','recipe','food','song',
-  'music','tell me about','story','news','stock','crypto','bitcoin','game','sport',
-  'who is','what is the meaning','girlfriend','poem','translate','homework',
-  'math','algebra','philosophy','language','dog','cat'
-];
-const UNRELATED_REPLY = "Sorry, I'm too simple to answer that. Try asking me for a repair price.";
-
-// --- RON state ---
-let ronOpen         = false;
-let ronIdleTimer    = null;
-let ronAnnoyTimer   = null;
-let ronBubbleTimer  = null;
-let ronMood         = 'normal'; // normal | thinking | happy | confused | annoyed | sleeping
-let ronAddFlow      = null;     // { stage, brand, model, repairType, nonProfit }
-let ronLastActivity = Date.now();
-
-// --- RON orb mood ---
-function ronSetMood(mood, duration = 2000) {
-  const orb = document.getElementById('ronOrb');
-  if (!orb) return;
-  orb.classList.remove('mood-thinking','mood-happy','mood-confused','mood-annoyed','mood-sleeping');
-  if (mood !== 'normal') {
-    orb.classList.add('mood-' + mood);
-    if (duration > 0) setTimeout(() => {
-      orb.classList.remove('mood-' + mood);
-      ronMood = 'normal';
-    }, duration);
-  }
-  ronMood = mood;
-}
-
-// --- Speech bubble beside orb ---
-function ronShowBubble(text, durationMs = 3500) {
-  const bubble = document.getElementById('ronBubble');
-  if (!bubble || ronOpen) return;
-  bubble.textContent = text;
-  bubble.style.display = 'block';
-  clearTimeout(ronBubbleTimer);
-  ronBubbleTimer = setTimeout(() => { bubble.style.display = 'none'; }, durationMs);
-}
-
-// --- Idle timer: show bubbles after inactivity (Change 5) ---
-function ronResetIdleTimer() {
-  ronLastActivity = Date.now();
-  clearTimeout(ronIdleTimer);
-  clearTimeout(ronAnnoyTimer);
-  if (!ronOpen) {
-    // Random interval 20-45s
-    const delay = 20000 + Math.floor(Math.random() * 25000);
-    ronIdleTimer = setTimeout(() => {
-      const msg = RON_IDLE_BUBBLES_V2[Math.floor(Math.random() * RON_IDLE_BUBBLES_V2.length)];
-      ronShowBubble(msg, 4000);
-      ronSetMood('normal', 0);
-      // After bubble fades, schedule the next one
-      setTimeout(() => ronResetIdleTimer(), 4500);
-      // Annoyed phase after very long ignore
-      ronAnnoyTimer = setTimeout(() => {
-        if (!ronOpen) {
-          ronSetMood('annoyed', 2000);
-          const annoyMsgs = ["I'm still here.", "Need a price?", "Still searching manually?"];
-          ronShowBubble(annoyMsgs[Math.floor(Math.random()*annoyMsgs.length)], 4000);
-        }
-      }, 60000);
-    }, delay);
-  }
-}
-
-// --- Toggle open/close ---
-function ronToggle() {
-  ronOpen = !ronOpen;
-  const panel  = document.getElementById('ronPanel');
-  const bubble = document.getElementById('ronBubble');
-  bubble.style.display = 'none';
-  clearTimeout(ronBubbleTimer);
-
-  if (ronOpen) {
-    panel.style.display = 'flex';
-    ronSetMood('normal', 0);
-    clearTimeout(ronIdleTimer);
-    clearTimeout(ronAnnoyTimer);
-    if (document.getElementById('ronMessages').children.length === 0) {
-      ronAppend('ron', RON_GREETINGS[0]);
-    }
-    setTimeout(() => document.getElementById('ronInput').focus(), 100);
-  } else {
-    panel.style.display = 'none';
-    ronAddFlow = null;
-    ronResetIdleTimer();
-  }
-}
-
-// --- Append message to chat ---
-function ronAppend(who, content, isHtml = false) {
-  const box = document.getElementById('ronMessages');
-  const wrap = document.createElement('div');
-  wrap.className = 'ron-msg ' + who;
-
-  if (who === 'ron') {
-    const uid = 'a' + Date.now() + Math.random().toString(36).slice(2,6);
-    wrap.innerHTML = `
-      <div class="ron-msg-avatar">
-        <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="${uid}-shell" cx="38%" cy="32%" r="72%">
-              <stop offset="0%"   stop-color="#0a2418" stop-opacity="0.9"/>
-              <stop offset="60%"  stop-color="#020906"/>
-              <stop offset="100%" stop-color="#000000"/>
-            </radialGradient>
-            <radialGradient id="${uid}-plasma" cx="40%" cy="38%" r="55%">
-              <stop offset="0%"  stop-color="#9affc4" stop-opacity="0.95"/>
-              <stop offset="35%" stop-color="#1aff7c" stop-opacity="0.6"/>
-              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-            </radialGradient>
-            <radialGradient id="${uid}-halo" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"  stop-color="#3dff8a" stop-opacity="0.5"/>
-              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-            </radialGradient>
-            <clipPath id="${uid}-clip"><circle cx="18" cy="18" r="13"/></clipPath>
-          </defs>
-          <circle cx="18" cy="18" r="17" fill="url(#${uid}-halo)"/>
-          <circle cx="18" cy="18" r="13" fill="url(#${uid}-shell)"/>
-          <g clip-path="url(#${uid}-clip)">
-            <ellipse cx="18" cy="18" rx="12" ry="10" fill="url(#${uid}-plasma)"/>
-          </g>
-          <ellipse cx="14" cy="13" rx="3.5" ry="1.8" fill="#ffffff" opacity="0.35" transform="rotate(-22 14 13)"/>
-        </svg>
-      </div>`;
-    const bubble = document.createElement('div');
-    bubble.className = 'ron-msg-bubble';
-    if (isHtml) bubble.innerHTML = content;
-    else bubble.textContent = content;
-    wrap.appendChild(bubble);
-  } else {
-    const bubble = document.createElement('div');
-    bubble.className = 'ron-msg-bubble';
-    bubble.textContent = content;
-    wrap.appendChild(bubble);
-  }
-
-  box.appendChild(wrap);
-  box.scrollTop = box.scrollHeight;
-}
-
-// --- Thinking animation ---
-function ronThinkingStart() {
-  ronSetMood('thinking', 0);
-  document.getElementById('ronStatus').textContent = '● Searching...';
-  const box  = document.getElementById('ronMessages');
-  const dots = document.createElement('div');
-  dots.className = 'ron-msg ron';
-  dots.id = 'ronThinkDots';
-  dots.innerHTML = `<div class="ron-msg-avatar"><svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="thinkShell" cx="38%" cy="32%" r="72%">
-        <stop offset="0%"   stop-color="#0a2418" stop-opacity="0.9"/>
-        <stop offset="60%"  stop-color="#020906"/>
-        <stop offset="100%" stop-color="#000000"/>
-      </radialGradient>
-      <radialGradient id="thinkPlasma" cx="40%" cy="38%" r="55%">
-        <stop offset="0%"  stop-color="#9affc4" stop-opacity="0.95"/>
-        <stop offset="35%" stop-color="#1aff7c" stop-opacity="0.6"/>
-        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="thinkHalo" cx="50%" cy="50%" r="50%">
-        <stop offset="0%"  stop-color="#3dff8a" stop-opacity="0.6"/>
-        <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-      </radialGradient>
-      <clipPath id="thinkClip"><circle cx="18" cy="18" r="13"/></clipPath>
-    </defs>
-    <circle cx="18" cy="18" r="17" fill="url(#thinkHalo)"/>
-    <circle cx="18" cy="18" r="13" fill="url(#thinkShell)"/>
-    <g clip-path="url(#thinkClip)">
-      <ellipse cx="18" cy="18" rx="12" ry="10" fill="url(#thinkPlasma)"/>
-    </g>
-    <ellipse cx="14" cy="13" rx="3.5" ry="1.8" fill="#ffffff" opacity="0.35" transform="rotate(-22 14 13)"/>
-    </svg></div>
-    <div class="ron-msg-bubble"><div class="ron-thinking"><span></span><span></span><span></span></div></div>`;
-  box.appendChild(dots);
-  box.scrollTop = box.scrollHeight;
-}
-function ronThinkingStop() {
-  document.getElementById('ronStatus').textContent = '● Online';
-  const d = document.getElementById('ronThinkDots');
-  if (d) d.remove();
-}
-
-// --- Build RON price card HTML ---
-function ronBuildCard(entry) {
-  const isLCD = entry.repairType === 'LCD';
-  const npStr  = fmt(entry.nonProfit);
-  const minStr = fmt(entry.minimum);
-  const maxStr = fmt(entry.maximum);
-  let pills = '';
-  if (isLCD && npStr) pills += `<div class="ron-card-pill p-np"><div class="ron-card-pill-label">Non-Profit</div><div class="ron-card-pill-value">${npStr}</div></div>`;
-  if (minStr)          pills += `<div class="ron-card-pill p-min"><div class="ron-card-pill-label">Minimum</div><div class="ron-card-pill-value">${minStr}</div></div>`;
-  if (maxStr)          pills += `<div class="ron-card-pill p-max"><div class="ron-card-pill-label">Maximum</div><div class="ron-card-pill-value">${maxStr}</div></div>`;
-  return `<div class="ron-price-card">
-    <div class="ron-card-brand">${entry.brand}</div>
-    <div class="ron-card-model">${entry.model}</div>
-    <span class="ron-card-type">${entry.repairType}</span>
-    <div class="ron-card-prices">${pills}</div>
-  </div>`;
-}
-
-// --- RON search prices ---
-function ronSearchRepairs(rawQuery) {
-  const q = normalize(expandAliases(rawQuery));
-  const queryModelNum = extractModelNumber(q);
-  return repairs
-    .map(entry => ({ entry, score: matchScore(entry, rawQuery) }))
-    .filter(r => r.score > 0)
-    .sort((a,b) => b.score - a.score)
-    .map(r => r.entry);
-}
-
-// --- Parse "add X" intent ---
-function ronParseAdd(input) {
-  const lower = input.toLowerCase().replace(/^add\s*/,'').trim();
-  // Try to detect repairType
-  let repairType = null;
-  if (/\blcd\b|screen|display/.test(lower)) repairType = 'LCD';
-  else if (/battery/.test(lower)) repairType = 'Battery';
-  else if (/charg|port/.test(lower)) repairType = 'Charging Port';
-  else if (/camera|cam/.test(lower)) repairType = 'Camera';
-  else if (/digi/.test(lower)) repairType = 'Digitizer';
-
-  // Strip repair type words to get model name
-  let modelRaw = lower
-    .replace(/\blcd\b|screen|display|battery|charging port|charger port|charge port|camera|cam|digitizer|digi/g,'')
-    .replace(/\s+/g,' ').trim();
-
-  // Detect brand
-  let brand = null;
-  if (/\biphone\b|\bip\b/.test(modelRaw)) brand = 'iPhone';
-  else if (/\bsamsung\b|\bgalaxy\b/.test(modelRaw)) brand = 'Samsung';
-  else if (/\bpixel\b/.test(modelRaw)) brand = 'Google Pixel';
-  else if (/\bmoto\b|\bmotorola\b/.test(modelRaw)) brand = 'Motorola';
-  else if (/\bipad\b/.test(modelRaw)) brand = 'iPad';
-
-  // Capitalize model
-  const model = modelRaw.replace(/\b\w/g, c => c.toUpperCase()).trim();
-  return { brand, model, repairType };
-}
-
-// --- Main RON process message ---
-function ronProcess(input) {
-  const raw   = input.trim();
-  const lower = raw.toLowerCase();
-
-  ronLastActivity = Date.now();
-
-  // ---- ADD FLOW ----
-  if (ronAddFlow) {
-    const stage = ronAddFlow.stage;
-
-    if (stage === 'confirm') {
-      if (/yes|yeah|yep|save|confirm|ok|sure/.test(lower)) {
-        // Save to repairs
-        const entry = {
-          id: genId(),
-          brand:      ronAddFlow.brand,
-          model:      ronAddFlow.model,
-          repairType: ronAddFlow.repairType,
-          nonProfit:  ronAddFlow.repairType === 'LCD' && ronAddFlow.nonProfit ? parseFloat(ronAddFlow.nonProfit) : null,
-          minimum:    parseFloat(ronAddFlow.minimum),
-          maximum:    ronAddFlow.maximum ? parseFloat(ronAddFlow.maximum) : null,
-          keywords:   [ronAddFlow.model.toLowerCase(), ronAddFlow.brand.toLowerCase() + ' ' + ronAddFlow.model.toLowerCase()],
-        };
-        repairs.push(entry);
-        saveData(repairs);
-        renderAdminList();
-        updateAdminCount();
-        ronAddFlow = null;
-        ronSetMood('happy', 1500);
-        ronThinkingStop();
-        ronAppend('ron', `Saved. ${entry.model} — ${entry.repairType} is now in the system. You can find it in search too.`);
-        return;
-      } else if (/no|nope|cancel|stop/.test(lower)) {
-        ronAddFlow = null;
-        ronAppend('ron', 'Got it. Cancelled.');
-        return;
-      } else {
-        ronAppend('ron', 'Just say yes to save or no to cancel.');
-        return;
-      }
-    }
-
-    if (stage === 'np') {
-      if (isNaN(parseFloat(raw))) { ronAppend('ron', 'Give me a number — like 140'); return; }
-      ronAddFlow.nonProfit = raw;
-      ronAddFlow.stage = 'min';
-      ronAppend('ron', 'Got it. Minimum price?');
-      return;
-    }
-    if (stage === 'min') {
-      if (isNaN(parseFloat(raw))) { ronAppend('ron', 'Number only — like 180'); return; }
-      ronAddFlow.minimum = raw;
-      ronAddFlow.stage = 'max';
-      ronAppend('ron', 'Maximum price?');
-      return;
-    }
-    if (stage === 'max') {
-      if (isNaN(parseFloat(raw)) && !/skip|none|var/i.test(raw)) { ronAppend('ron', 'Number, or say "skip" if it varies.'); return; }
-      ronAddFlow.maximum = /skip|none|var/i.test(raw) ? null : raw;
-      ronAddFlow.stage = 'confirm';
-      const npLine = ronAddFlow.repairType === 'LCD' && ronAddFlow.nonProfit ? `\nNon-Profit: $${ronAddFlow.nonProfit}` : '';
-      const maxLine = ronAddFlow.maximum ? `\nMaximum: $${ronAddFlow.maximum}` : '\nMaximum: varies';
-      ronAppend('ron', `Here's what I have:\n\nBrand: ${ronAddFlow.brand || 'Unknown'}\nModel: ${ronAddFlow.model}\nType: ${ronAddFlow.repairType}${npLine}\nMinimum: $${ronAddFlow.minimum}${maxLine}\n\nSave this?`);
-      return;
-    }
-    if (stage === 'brand') {
-      ronAddFlow.brand = raw.trim();
-      ronAddFlow.stage = ronAddFlow.repairType === 'LCD' ? 'np' : 'min';
-      if (ronAddFlow.repairType === 'LCD') ronAppend('ron', `Got it. Non-profit price for ${ronAddFlow.model}?`);
-      else ronAppend('ron', `Got it. Minimum price for ${ronAddFlow.model}?`);
-      return;
-    }
-    if (stage === 'repairType') {
-      let rt = null;
-      if (/lcd|screen|display/.test(lower)) rt = 'LCD';
-      else if (/battery/.test(lower)) rt = 'Battery';
-      else if (/charg|port/.test(lower)) rt = 'Charging Port';
-      else if (/camera|cam/.test(lower)) rt = 'Camera';
-      else if (/digi/.test(lower)) rt = 'Digitizer';
-      if (!rt) { ronAppend('ron', 'What type? LCD, Battery, Charging Port, Camera, or Digitizer?'); return; }
-      ronAddFlow.repairType = rt;
-      ronAddFlow.stage = ronAddFlow.repairType === 'LCD' ? 'np' : 'min';
-      if (ronAddFlow.repairType === 'LCD') ronAppend('ron', `Non-profit price?`);
-      else ronAppend('ron', `Minimum price?`);
-      return;
-    }
-  }
-
-  // ---- ADD INTENT ----
-  if (/^add\s+.+/.test(lower)) {
-    const parsed = ronParseAdd(raw);
-    ronAddFlow = { stage: null, ...parsed };
-    if (!parsed.model || parsed.model.length < 2) {
-      ronAddFlow = null;
-      ronAppend('ron', 'What model do you want to add? Like: add iPhone 18 LCD');
-      return;
-    }
-    if (!parsed.brand) {
-      ronAddFlow.stage = 'brand';
-      ronAppend('ron', `What brand is "${parsed.model}"? iPhone, Samsung, Google Pixel, Motorola, iPad?`);
-      return;
-    }
-    if (!parsed.repairType) {
-      ronAddFlow.stage = 'repairType';
-      ronAppend('ron', `What repair type for ${parsed.model}? LCD, Battery, Charging Port, Camera, or Digitizer?`);
-      return;
-    }
-    ronAddFlow.stage = parsed.repairType === 'LCD' ? 'np' : 'min';
-    if (parsed.repairType === 'LCD') ronAppend('ron', `Got it — ${parsed.brand} ${parsed.model} LCD. Non-profit price?`);
-    else ronAppend('ron', `Got it — ${parsed.brand} ${parsed.model} ${parsed.repairType}. Minimum price?`);
-    return;
-  }
-
-  // ---- GREETING ----
-  if (/^(hi|hey|hello|yo|sup|what'?s up|wassup|ron\??$)/.test(lower)) {
-    ronAppend('ron', RON_GREETINGS[0]);
-    return;
-  }
-
-  // ---- UNRELATED TOPIC GUARD (Change 8) ----
-  // Only trigger if the message is clearly off-topic — has no repair/model words
-  // AND contains a known unrelated keyword OR is a long sentence without numbers
-  const looksLikePriceQuery = /\b(iphone|ipad|samsung|galaxy|pixel|moto|ip|lcd|screen|display|battery|charging|charge|camera|cam|digi|digitizer|port|speaker|proximity|fix|repair|cost|price|how much|s\d+|a\d+|\d+[a-z]?|add)\b/i.test(lower);
-  const looksUnrelated = UNRELATED_KEYWORDS.some(k => lower.includes(k));
-  if (!looksLikePriceQuery && (looksUnrelated || lower.split(/\s+/).length >= 4)) {
-    ronSetMood('confused', 1500);
-    ronAppend('ron', UNRELATED_REPLY);
-    return;
-  }
-
-  // ---- PRICE SEARCH ----
-  ronThinkingStart();
-  ronSetMood('thinking', 0);
-
-  setTimeout(() => {
-    ronThinkingStop();
-    const results = ronSearchRepairs(raw);
-
-    if (results.length === 0) {
-      ronSetMood('confused', 2000);
-      ronAppend('ron', "Call your manager for price info please. I don't have that data yet.");
-      return;
-    }
-
-    if (results.length === 1) {
-      ronSetMood('happy', 1500);
-      ronAppend('ron', 'Found it.', false);
-      ronAppend('ron', ronBuildCard(results[0]), true);
-      return;
-    }
-
-    // Check if all results are clearly the same family (e.g. iPhone 13 + 13 Mini + 13 Pro + 13 Pro Max)
-    // — same brand. Then just show them; not ambiguous.
-    const brands = new Set(results.map(r => r.brand));
-    const types  = new Set(results.map(r => r.repairType));
-
-    if (results.length <= 5 && brands.size === 1) {
-      ronSetMood('happy', 1500);
-      ronAppend('ron', `Found ${results.length} matches:`, false);
-      results.forEach(r => ronAppend('ron', ronBuildCard(r), true));
-      return;
-    }
-
-    // Multiple brands → truly ambiguous, ask for clarification (Change 7)
-    if (brands.size > 1) {
-      ronSetMood('confused', 1500);
-      const brandList = [...brands];
-      let chipsHtml = '<div class="ron-chips">';
-      brandList.forEach(b => {
-        const count = results.filter(r => r.brand === b).length;
-        const label = `${b} (${count})`;
-        chipsHtml += `<button class="ron-chip" onclick="ronChipClick('${(raw + ' ' + b).replace(/'/g,"\\'")}')">${label}</button>`;
-      });
-      chipsHtml += '</div>';
-      ronAppend('ron', `Do you mean:`, false);
-      ronAppend('ron', chipsHtml, true);
-      return;
-    }
-
-    // Same brand but many — show all (within reason)
-    if (results.length <= 8) {
-      ronSetMood('happy', 1500);
-      ronAppend('ron', `Found ${results.length} matches:`, false);
-      results.forEach(r => ronAppend('ron', ronBuildCard(r), true));
-      return;
-    }
-
-    // Too many — chip suggestions
-    ronSetMood('confused', 1500);
-    const preview = results.slice(0, 5);
-    let chipsHtml = '<div class="ron-chips">';
-    preview.forEach(r => {
-      const label = r.model + ' ' + r.repairType;
-      chipsHtml += `<button class="ron-chip" onclick="ronChipClick('${label.replace(/'/g,"\\'")}')">${label}</button>`;
-    });
-    chipsHtml += '</div>';
-    ronAppend('ron', `Which one did you mean?`, false);
-    ronAppend('ron', chipsHtml, true);
-  }, 650);
-}
-
-function ronChipClick(label) {
-  document.getElementById('ronInput').value = label;
-  ronAppend('user', label);
-  ronProcess(label);
-}
-
-// --- Send ---
-function ronSend() {
-  const inp = document.getElementById('ronInput');
-  const val = inp.value.trim();
-  if (!val) return;
-  ronAppend('user', val);
-  inp.value = '';
-  ronProcess(val);
-}
-
-// --- Enter key in RON input ---
-function ronInit() {
-  const inp = document.getElementById('ronInput');
-  if (inp) {
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') ronSend();
-    });
-  }
-  ronResetIdleTimer();
-  // Reset idle on any page interaction
-  document.addEventListener('click', () => ronResetIdleTimer());
-  document.addEventListener('keydown', () => ronResetIdleTimer());
+@media (max-width: 640px) {
+  .ron-panel { left: 12px; right: 12px; width: auto; }
+  #ronOrb    { left: 16px; bottom: 16px; }
 }
