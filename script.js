@@ -1,14 +1,12 @@
 /* =============================================
-   REPAIR PRICE LOOKUP — script.js
-   Internal Staff Tool
+   REPAIR 1.0 / V1 — script.js
+   Changes: Search fix · RON orb+chat · Boot loader
    ============================================= */
 
 // -----------------------------------------------
 // DEFAULT DATA
 // -----------------------------------------------
 const DEFAULT_DATA = [
-
-  // ---- iPHONE LCD ----
   { id:'d1',  brand:'iPhone', model:'iPhone 6',           repairType:'LCD', nonProfit:50,  minimum:60,  maximum:75,  keywords:['iphone 6','6 lcd'] },
   { id:'d2',  brand:'iPhone', model:'iPhone 6 Plus',      repairType:'LCD', nonProfit:55,  minimum:60,  maximum:75,  keywords:['6 plus','6+','6plus'] },
   { id:'d3',  brand:'iPhone', model:'iPhone 6S',          repairType:'LCD', nonProfit:50,  minimum:70,  maximum:80,  keywords:['6s'] },
@@ -48,21 +46,13 @@ const DEFAULT_DATA = [
   { id:'d37', brand:'iPhone', model:'iPhone 17',          repairType:'LCD', nonProfit:280, minimum:300, maximum:380, keywords:['17 lcd','iphone 17'] },
   { id:'d38', brand:'iPhone', model:'iPhone 17 Pro',      repairType:'LCD', nonProfit:290, minimum:350, maximum:400, keywords:['17 pro','17pro'] },
   { id:'d39', brand:'iPhone', model:'iPhone 17 Pro Max',  repairType:'LCD', nonProfit:340, minimum:390, maximum:450, keywords:['17 pm','17 pro max','17promax','17pm'] },
-
-  // ---- iPHONE CAMERA ----
   { id:'d40', brand:'iPhone', model:'iPhone Camera (X – 12 Pro Max)', repairType:'Camera', minimum:80,  maximum:100, keywords:['iphone camera','x camera','11 camera','12 camera','xs camera','xr camera'] },
   { id:'d41', brand:'iPhone', model:'iPhone Camera (13 / 14 / 14 Plus / 15 / 15 Plus)', repairType:'Camera', minimum:100, maximum:130, keywords:['13 camera','14 camera','15 camera'] },
   { id:'d42', brand:'iPhone', model:'iPhone Camera (13 Pro / 13 PM / 14 Pro / 14 PM)', repairType:'Camera', minimum:150, maximum:200, keywords:['13 pro camera','14 pro camera','13pm camera','14pm camera'] },
-
-  // ---- iPHONE PROXIMITY ----
   { id:'d43', brand:'iPhone', model:'iPhone Proximity (Up to 12 Pro Max)', repairType:'Proximity', minimum:60, maximum:80, keywords:['proximity','iphone proximity','6 proximity','7 proximity','8 proximity','x proximity','11 proximity','12 proximity'] },
   { id:'d44', brand:'iPhone', model:'iPhone Proximity (13 – 15 Pro Max)', repairType:'Proximity', minimum:80, maximum:100, keywords:['13 proximity','14 proximity','15 proximity'] },
-
-  // ---- iPHONE CHARGING PORT / SPEAKER ----
   { id:'d45', brand:'iPhone', model:'iPhone Charging Port / Speaker (Up to 12 Pro Max)', repairType:'Charging Port', minimum:60, maximum:100, keywords:['iphone charging','iphone port','charging port','6 port','7 port','8 port','x port','11 port','12 port','speaker','loud speaker'] },
   { id:'d46', brand:'iPhone', model:'iPhone Charging Port / Speaker (13 – 15 Pro Max)', repairType:'Charging Port', minimum:80, maximum:160, keywords:['13 port','14 port','15 port','13 charging','14 charging','15 charging'] },
-
-  // ---- iPHONE BATTERY ----
   { id:'d47', brand:'iPhone', model:'iPhone Battery (8 / SE / X / XS / XS Max / XR)', repairType:'Battery', minimum:70, maximum:90, keywords:['8 battery','se battery','x battery','xs battery','xr battery'] },
   { id:'d48', brand:'iPhone', model:'iPhone Battery (11 / 11 Pro / 11 Pro Max)', repairType:'Battery', minimum:80, maximum:100, keywords:['11 battery','11 pro battery','11 pm battery'] },
   { id:'d49', brand:'iPhone', model:'iPhone Battery (12 / 12 Pro / 12 Pro Max)', repairType:'Battery', minimum:90, maximum:120, keywords:['12 battery','12 pro battery','12pm battery'] },
@@ -72,8 +62,6 @@ const DEFAULT_DATA = [
   { id:'d53', brand:'iPhone', model:'iPhone Battery (15 / 15 Plus)', repairType:'Battery', minimum:100, maximum:150, keywords:['15 battery','15 plus battery'] },
   { id:'d54', brand:'iPhone', model:'iPhone Battery (15 Pro / 15 Pro Max)', repairType:'Battery', minimum:120, maximum:180, keywords:['15 pro battery','15pm battery'] },
   { id:'d55', brand:'iPhone', model:'iPhone Battery (16 Pro Max)', repairType:'Battery', minimum:140, maximum:200, keywords:['16 pro max battery','16pm battery'] },
-
-  // ---- SAMSUNG LCD ----
   { id:'d60', brand:'Samsung', model:'Samsung S8',         repairType:'LCD', nonProfit:140, minimum:170, maximum:200, keywords:['s8','galaxy s8'] },
   { id:'d61', brand:'Samsung', model:'Samsung S8 Plus',    repairType:'LCD', nonProfit:150, minimum:190, maximum:230, keywords:['s8+','s8 plus'] },
   { id:'d62', brand:'Samsung', model:'Samsung S9',         repairType:'LCD', nonProfit:140, minimum:180, maximum:220, keywords:['s9','galaxy s9'] },
@@ -124,14 +112,10 @@ const DEFAULT_DATA = [
   { id:'d107',brand:'Samsung', model:'Samsung A70',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a70'] },
   { id:'d108',brand:'Samsung', model:'Samsung A71',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a71'] },
   { id:'d109',brand:'Samsung', model:'Samsung A73',   repairType:'LCD', nonProfit:160, minimum:190, maximum:130, keywords:['a73'] },
-
-  // ---- SAMSUNG BATTERY / CHARGING ----
   { id:'d110',brand:'Samsung', model:'Samsung Battery (All A Series)', repairType:'Battery', minimum:60,  maximum:80,  keywords:['samsung battery','a series battery','samsung a battery'] },
   { id:'d111',brand:'Samsung', model:'Samsung Battery (All S Series)', repairType:'Battery', minimum:120, maximum:120, keywords:['samsung s battery','s series battery','s20 battery','s21 battery','s22 battery','s23 battery'] },
   { id:'d112',brand:'Samsung', model:'Samsung Charging Port (All A Series)', repairType:'Charging Port', minimum:60, maximum:90,  keywords:['samsung charging','samsung a port'] },
   { id:'d113',brand:'Samsung', model:'Samsung Charging Port (All S Series)', repairType:'Charging Port', minimum:70, maximum:110, keywords:['samsung s port','samsung s charging','s21 port','s22 port','s23 port'] },
-
-  // ---- MOTOROLA LCD ----
   { id:'d120',brand:'Motorola', model:'Moto G Stylus 2020 (XT2043)',    repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['moto stylus','g stylus','stylus 2020','xt2043'] },
   { id:'d121',brand:'Motorola', model:'Moto G Stylus 2021 4G (XT2115)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2021','xt2115','g stylus 2021 4g'] },
   { id:'d122',brand:'Motorola', model:'Moto G Stylus 2021 5G (XT2131)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['stylus 2021 5g','xt2131'] },
@@ -149,8 +133,6 @@ const DEFAULT_DATA = [
   { id:'d134',brand:'Motorola', model:'Moto G Power / G10 Play 2021 (XT2117)', repairType:'LCD', nonProfit:110, minimum:110, maximum:140, keywords:['g10 play','xt2117'] },
   { id:'d135',brand:'Motorola', model:'Motorola Battery (All Models)',   repairType:'Battery',       minimum:80, maximum:100, keywords:['motorola battery','moto battery'] },
   { id:'d136',brand:'Motorola', model:'Motorola Charging Port (All Models)', repairType:'Charging Port', minimum:60, maximum:90, keywords:['motorola port','moto port','moto charging'] },
-
-  // ---- GOOGLE PIXEL LCD ----
   { id:'d140',brand:'Google Pixel', model:'Pixel 6',        repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['pixel 6','google pixel 6','p6'] },
   { id:'d141',brand:'Google Pixel', model:'Pixel 6A',       repairType:'LCD', nonProfit:140, minimum:150, maximum:180, keywords:['pixel 6a','pixel6a','p6a'] },
   { id:'d142',brand:'Google Pixel', model:'Pixel 7',        repairType:'LCD', nonProfit:120, minimum:140, maximum:180, keywords:['pixel 7','google pixel 7','p7'] },
@@ -161,8 +143,6 @@ const DEFAULT_DATA = [
   { id:'d147',brand:'Google Pixel', model:'Pixel 9A',       repairType:'LCD', nonProfit:160, minimum:190, maximum:null, keywords:['pixel 9a','pixel9a','p9a'] },
   { id:'d148',brand:'Google Pixel', model:'Pixel 9 Pro',    repairType:'LCD', nonProfit:155, minimum:200, maximum:null, keywords:['pixel 9 pro','pixel9pro'] },
   { id:'d149',brand:'Google Pixel', model:'Pixel 9 Pro XL', repairType:'LCD', nonProfit:250, minimum:320, maximum:null, keywords:['pixel 9 pro xl','9 pro xl'] },
-
-  // ---- iPAD LCD (screen only — no digitizer) ----
   { id:'d162',brand:'iPad', model:'iPad 7/8/9 LCD',               repairType:'LCD', nonProfit:120, minimum:150, maximum:180, keywords:['ipad 7 lcd','ipad 8 lcd','ipad 9 lcd'] },
   { id:'d164',brand:'iPad', model:'iPad 10 LCD',                  repairType:'LCD', nonProfit:155, minimum:190, maximum:240, keywords:['ipad 10 lcd','ipad 10th gen lcd'] },
   { id:'d165',brand:'iPad', model:'iPad 5/6 LCD',                 repairType:'LCD', nonProfit:120, minimum:130, maximum:160, keywords:['ipad 5 lcd','ipad 6 lcd'] },
@@ -181,16 +161,12 @@ const DEFAULT_DATA = [
   { id:'d181',brand:'iPad', model:'iPad Pro 11 LCD (Gen 3/4)',    repairType:'LCD', nonProfit:210, minimum:240, maximum:280, keywords:['pro 11 gen 3','pro 11 gen 4','ipad pro 11 g3','ipad pro 11 g4'] },
   { id:'d182',brand:'iPad', model:'iPad Pro 12.9 LCD (Gen 3/4)',  repairType:'LCD', nonProfit:200, minimum:220, maximum:260, keywords:['pro 12.9 gen 3','pro 12.9 gen 4','ipad pro 12 g3'] },
   { id:'d183',brand:'iPad', model:'iPad Pro 12.9 LCD (Gen 5/6)',  repairType:'LCD', nonProfit:275, minimum:300, maximum:380, keywords:['pro 12.9 gen 5','pro 12.9 gen 6','ipad pro 12 g5'] },
-
-  // ---- iPAD DIGITIZER (Touch Only — separate from LCD) ----
   { id:'dg1', brand:'iPad', model:'iPad 5/6 Touch Digitizer',      repairType:'Digitizer', minimum:90,  maximum:150, keywords:['ipad 5 digi','ipad 6 digi','ipad 5 digitizer','ipad 6 digitizer','ipad 5 touch','ipad 6 touch'] },
   { id:'dg2', brand:'iPad', model:'iPad 7/8/9 Touch Digitizer',    repairType:'Digitizer', minimum:90,  maximum:180, keywords:['ipad 7 digi','ipad 8 digi','ipad 9 digi','ipad 7 digitizer','ipad 7 touch'] },
   { id:'dg3', brand:'iPad', model:'iPad 10 Touch Digitizer',       repairType:'Digitizer', minimum:100, maximum:180, keywords:['ipad 10 digi','ipad 10 digitizer','ipad 10 touch'] },
   { id:'dg4', brand:'iPad', model:'iPad Air 1 Touch Digitizer',    repairType:'Digitizer', minimum:90,  maximum:140, keywords:['air 1 digi','air 1 touch','ipad air 1 digitizer'] },
   { id:'dg5', brand:'iPad', model:'iPad Mini 1/2 Touch Digitizer', repairType:'Digitizer', minimum:85,  maximum:140, keywords:['mini 1 digi','mini 2 digi','mini 1 touch','mini 2 touch'] },
   { id:'dg6', brand:'iPad', model:'iPad Mini 3 Touch Digitizer',   repairType:'Digitizer', minimum:180, maximum:360, keywords:['mini 3 digi','mini 3 touch','mini 3 digitizer'] },
-
-  // ---- iPAD BATTERY / CHARGING ----
   { id:'d190',brand:'iPad', model:'iPad Battery (All iPads)',        repairType:'Battery',      minimum:130, maximum:180, keywords:['ipad battery','ipad air battery','ipad mini battery','ipad pro battery'] },
   { id:'d191',brand:'iPad', model:'iPad Charging Port (All iPads)', repairType:'Charging Port', minimum:140, maximum:180, keywords:['ipad charging','ipad port'] },
 ];
@@ -216,39 +192,28 @@ const QUICK_REPAIRS = [
 // -----------------------------------------------
 // STORAGE
 // -----------------------------------------------
-const LS_KEY         = 'repairPriceData_v2';
-const LS_CAT_KEY     = 'repairCustomCategories';
+const LS_KEY          = 'repairPriceData_v2';
+const LS_CAT_KEY      = 'repairCustomCategories';
 const LS_IPAD_CAT_KEY = 'repairIpadCustomCategories';
 
 function loadData() {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
+    if (raw) { const p = JSON.parse(raw); if (Array.isArray(p) && p.length > 0) return p; }
   } catch(e) {}
   return null;
 }
 function saveData(data) { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
-
 function loadCustomCategories() {
-  try {
-    const raw = localStorage.getItem(LS_CAT_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
+  try { const r = localStorage.getItem(LS_CAT_KEY); if (r) return JSON.parse(r); } catch(e) {}
   return [];
 }
-function saveCustomCategories(cats) { localStorage.setItem(LS_CAT_KEY, JSON.stringify(cats)); }
-
+function saveCustomCategories(c) { localStorage.setItem(LS_CAT_KEY, JSON.stringify(c)); }
 function loadIpadCustomCategories() {
-  try {
-    const raw = localStorage.getItem(LS_IPAD_CAT_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
+  try { const r = localStorage.getItem(LS_IPAD_CAT_KEY); if (r) return JSON.parse(r); } catch(e) {}
   return [];
 }
-function saveIpadCustomCategories(cats) { localStorage.setItem(LS_IPAD_CAT_KEY, JSON.stringify(cats)); }
+function saveIpadCustomCategories(c) { localStorage.setItem(LS_IPAD_CAT_KEY, JSON.stringify(c)); }
 
 function initData() {
   const stored = loadData();
@@ -269,9 +234,52 @@ let activeIpadSubCategory = 'all';
 let editingId = null;
 
 // -----------------------------------------------
+// BOOT LOADER
+// -----------------------------------------------
+const BOOT_MESSAGES = [
+  'Redirecting…',
+  'Searching server…',
+  'Connecting to Greensboro RON Server…',
+  'Kritesh system initialized…',
+  'RON initialized…',
+  'Loading Repair 1.0…',
+];
+
+function runBoot() {
+  const loader  = document.getElementById('bootLoader');
+  const msgEl   = document.getElementById('bootMsg');
+  const barFill = document.getElementById('bootBarFill');
+  if (!loader) return;
+
+  const totalMs = 4200;
+  const step    = totalMs / BOOT_MESSAGES.length;
+  let   idx     = 0;
+
+  msgEl.textContent = BOOT_MESSAGES[0];
+  barFill.style.width = '5%';
+
+  const iv = setInterval(() => {
+    idx++;
+    if (idx >= BOOT_MESSAGES.length) {
+      clearInterval(iv);
+      barFill.style.width = '100%';
+      msgEl.textContent = '✓ RON ONLINE';
+      setTimeout(() => {
+        loader.classList.add('fade-out');
+        setTimeout(() => { loader.style.display = 'none'; }, 850);
+      }, 500);
+      return;
+    }
+    msgEl.textContent = BOOT_MESSAGES[idx];
+    barFill.style.width = ((idx + 1) / BOOT_MESSAGES.length * 100) + '%';
+  }, step);
+}
+
+// -----------------------------------------------
 // INIT
 // -----------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+  runBoot();
   initData();
   buildQuickGrid();
   attachSearchListeners();
@@ -280,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
   populateBrandSelect();
   renderAdminList();
   updateAdminCount();
+  ronInit();
 });
 
 // -----------------------------------------------
@@ -301,8 +310,7 @@ function buildQuickGrid() {
   grid.innerHTML = QUICK_REPAIRS.map(q => `
     <button class="quick-chip" onclick="quickSearch('${q.searchFor}')">
       <span class="quick-chip-icon">${q.icon}</span>${q.label}
-    </button>
-  `).join('');
+    </button>`).join('');
 }
 
 function quickSearch(term) {
@@ -313,26 +321,25 @@ function quickSearch(term) {
 }
 
 // -----------------------------------------------
-// DYNAMIC FILTERS (custom categories)
+// DYNAMIC FILTERS
 // -----------------------------------------------
 function renderDynamicFilters() {
-  const span = document.getElementById('dynamicFilters');
-  span.innerHTML = customCategories.map(cat => `
-    <button class="filter-btn" data-cat="${cat}" onclick="setFilter(this, '${cat}')">${cat}</button>
-  `).join('');
+  document.getElementById('dynamicFilters').innerHTML = customCategories.map(cat =>
+    `<button class="filter-btn" data-cat="${cat}" onclick="setFilter(this,'${cat}')">${cat}</button>`
+  ).join('');
 }
 
 function setFilter(btn, cat) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   activeCategory = cat;
-  const subStrip = document.getElementById('ipadSubfilters');
+  const sub = document.getElementById('ipadSubfilters');
   if (cat === 'iPad') {
-    subStrip.style.display = '';
+    sub.style.display = '';
     activeIpadSubCategory = 'all';
     document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.icat === 'all'));
   } else {
-    subStrip.style.display = 'none';
+    sub.style.display = 'none';
     activeIpadSubCategory = 'all';
   }
   runSearch(document.getElementById('searchInput').value);
@@ -346,14 +353,13 @@ function setIpadSubFilter(btn, icat) {
 }
 
 function renderDynamicIpadFilters() {
-  const span = document.getElementById('dynamicIpadFilters');
-  span.innerHTML = ipadCustomCategories.map(cat => `
-    <button class="ipad-sub-btn" data-icat="${cat}" onclick="setIpadSubFilter(this,'${cat}')">${cat}</button>
-  `).join('');
+  document.getElementById('dynamicIpadFilters').innerHTML = ipadCustomCategories.map(cat =>
+    `<button class="ipad-sub-btn" data-icat="${cat}" onclick="setIpadSubFilter(this,'${cat}')">${cat}</button>`
+  ).join('');
 }
 
 // -----------------------------------------------
-// SEARCH
+// SEARCH  (CHANGE 1 — precision fix)
 // -----------------------------------------------
 function attachSearchListeners() {
   const input    = document.getElementById('searchInput');
@@ -363,34 +369,29 @@ function attachSearchListeners() {
     clearBtn.style.display = input.value ? 'block' : 'none';
     runSearch(input.value);
   });
-
   clearBtn.addEventListener('click', () => {
     input.value = '';
     clearBtn.style.display = 'none';
     showHomepage();
     input.focus();
   });
-
   document.querySelectorAll('#filters .filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeCategory = btn.dataset.cat;
-      // Show iPad sub-filter strip only when iPad is selected
-      const subStrip = document.getElementById('ipadSubfilters');
+      const sub = document.getElementById('ipadSubfilters');
       if (activeCategory === 'iPad') {
-        subStrip.style.display = '';
+        sub.style.display = '';
         activeIpadSubCategory = 'all';
         document.querySelectorAll('.ipad-sub-btn').forEach(b => b.classList.toggle('active', b.dataset.icat === 'all'));
       } else {
-        subStrip.style.display = 'none';
+        sub.style.display = 'none';
         activeIpadSubCategory = 'all';
       }
       runSearch(input.value);
     });
   });
-
-  // iPad sub-filter buttons (static ones wired here; dynamic ones use setIpadSubFilter)
   document.querySelectorAll('.ipad-sub-btn').forEach(btn => {
     btn.addEventListener('click', () => setIpadSubFilter(btn, btn.dataset.icat));
   });
@@ -400,16 +401,28 @@ function normalize(str) {
   return (str || '').toLowerCase().replace(/\s+/g,' ').replace(/[^a-z0-9 ]/g,'').trim();
 }
 
+// Alias table: casual shorthand → canonical form
 const ALIASES = [
-  [/\b(\d{2})\s*pm\b/g,  '$1 pro max'],
-  [/\b(\d{2})\s*p\b/g,   '$1 pro'],
-  [/\b(\d{2})[+]\b/g,    '$1 plus'],
-  [/\biphone\s*/g,        'iphone '],
-  [/\bsamsung\s*/g,       'samsung '],
-  [/\bgalaxy\s*/g,        'samsung '],
-  [/\bmoto\s*/g,          'motorola '],
-  [/\bpixel\s*/g,         'pixel '],
-  [/\bdigi\b/g,           'digitizer'],
+  [/\b(\d{2})\s*pm\b/g,        '$1 pro max'],
+  [/\b(\d{2})\s*p\b/g,         '$1 pro'],
+  [/\b(\d{2})[+]\b/g,          '$1 plus'],
+  [/\bip\b/g,                   'iphone'],
+  [/\biphone\s*/g,              'iphone '],
+  [/\bsamsung\s*/g,             'samsung '],
+  [/\bgalaxy\s*/g,              'samsung '],
+  [/\bmoto\s*/g,                'motorola '],
+  [/\bpixel\s*/g,               'pixel '],
+  [/\bdigi\b/g,                 'digitizer'],
+  [/\bscreen\b/g,               'lcd'],
+  [/\bdisplay\b/g,              'lcd'],
+  [/\bcharge port\b/g,          'charging port'],
+  [/\bcharger port\b/g,         'charging port'],
+  [/\bcharge\b/g,               'charging'],
+  [/\bcam\b/g,                  'camera'],
+  [/\bfix\b/g,                  ''],
+  [/\bhow much (to|for)\b/g,    ''],
+  [/\bprice\b/g,                ''],
+  [/\bcost\b/g,                 ''],
 ];
 
 function expandAliases(q) {
@@ -418,14 +431,36 @@ function expandAliases(q) {
   return s.replace(/\s+/g,' ').trim();
 }
 
+// ---- PRECISION SEARCH: prevent "iPhone 11" matching "iPhone 12", "13", etc. ----
+// Extract a model number token if present (e.g. "11", "13", "8a", "s23", "a15")
+function extractModelNumber(q) {
+  // Match patterns like: 11, 13, 15, 8a, s23, a15, 7a, 9a, 9 pro, etc.
+  const m = q.match(/\b(s\d+|a\d+|\d+[a-z]?)\b/i);
+  return m ? m[1].toLowerCase() : null;
+}
+
+function modelNumberMatches(entry, queryModelNum) {
+  if (!queryModelNum) return true; // no number constraint — let everything through
+  const haystack = normalize(entry.model) + ' ' + (entry.keywords || []).map(normalize).join(' ');
+  // The model number from the query must appear as a standalone token in the entry
+  const re = new RegExp('\\b' + queryModelNum.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
+  return re.test(haystack);
+}
+
 function matchScore(entry, query) {
   if (!query) return 0;
-  const q        = normalize(expandAliases(query));
-  const model    = normalize(entry.model);
-  const brand    = normalize(entry.brand);
-  const type     = normalize(entry.repairType);
-  const combined = `${brand} ${model} ${type}`;
-  const keywords = (entry.keywords || []).map(normalize);
+  const expanded  = expandAliases(query);
+  const q         = normalize(expanded);
+  const model     = normalize(entry.model);
+  const brand     = normalize(entry.brand);
+  const type      = normalize(entry.repairType);
+  const combined  = `${brand} ${model} ${type}`;
+  const keywords  = (entry.keywords || []).map(normalize);
+
+  // --- PRECISION GATE ---
+  // If the query contains a model number, ONLY entries whose model also contains that exact number pass
+  const queryModelNum = extractModelNumber(q);
+  if (queryModelNum && !modelNumberMatches(entry, queryModelNum)) return 0;
 
   if (combined === q) return 100;
   if (combined.includes(q)) return 80;
@@ -433,7 +468,7 @@ function matchScore(entry, query) {
   if (keywords.some(k => k === q)) return 90;
   if (keywords.some(k => k.includes(q))) return 70;
 
-  const tokens  = q.split(' ').filter(Boolean);
+  const tokens   = q.split(' ').filter(Boolean);
   const allMatch = tokens.every(t => combined.includes(t) || keywords.some(k => k.includes(t)));
   if (allMatch) return 60;
 
@@ -462,19 +497,15 @@ function runSearch(query) {
 
   let results = repairs.map(entry => ({ entry, score: matchScore(entry, q) }));
 
-  // Main category filter
   if (activeCategory !== 'all') {
     results = results.filter(({ entry }) => {
       const cat = getRepairCategory(entry);
-      if (activeCategory === 'Other') {
-        return !STATIC_CATS.includes(cat) && !customCategories.includes(cat);
-      }
+      if (activeCategory === 'Other') return !STATIC_CATS.includes(cat) && !customCategories.includes(cat);
       return cat === activeCategory;
     });
     if (!q) results.forEach(r => r.score = 1);
   }
 
-  // iPad sub-category filter (only active when category is iPad)
   if (activeCategory === 'iPad' && activeIpadSubCategory !== 'all') {
     results = results.filter(({ entry }) =>
       (entry.repairType || '').toLowerCase() === activeIpadSubCategory.toLowerCase()
@@ -505,68 +536,48 @@ function showHomepage() {
 // -----------------------------------------------
 // RENDER CARD
 // -----------------------------------------------
-function typeClass(repairType) {
-  const t = (repairType || '').toLowerCase();
-  if (t === 'lcd')          return 'type-lcd';
-  if (t === 'digitizer')    return 'type-digi';
-  if (t === 'battery')      return 'type-battery';
-  if (t === 'charging port')return 'type-charging';
-  if (t === 'camera')       return 'type-camera';
+function typeClass(t) {
+  t = (t||'').toLowerCase();
+  if (t==='lcd')           return 'type-lcd';
+  if (t==='digitizer')     return 'type-digi';
+  if (t==='battery')       return 'type-battery';
+  if (t==='charging port') return 'type-charging';
+  if (t==='camera')        return 'type-camera';
   return 'type-other';
 }
-
 function fmt(val) {
   if (val == null || val === '') return null;
   return '$' + Number(val).toLocaleString();
 }
-
 function renderCard(entry) {
   const isLCD = entry.repairType === 'LCD';
   const npStr  = fmt(entry.nonProfit);
   const minStr = fmt(entry.minimum);
   const maxStr = fmt(entry.maximum);
-
-  let pillsHTML = '';
-  if (isLCD && npStr) {
-    pillsHTML += `<div class="price-pill pill-np"><div class="price-pill-label">Non-Profit</div><div class="price-pill-value">${npStr}</div></div>`;
-  }
-  if (minStr) {
-    pillsHTML += `<div class="price-pill pill-min"><div class="price-pill-label">Minimum</div><div class="price-pill-value">${minStr}</div></div>`;
-  }
-  if (maxStr) {
-    pillsHTML += `<div class="price-pill pill-max"><div class="price-pill-label">Maximum</div><div class="price-pill-value">${maxStr}</div></div>`;
-  }
-
-  const variableNote = (!maxStr && minStr) ? '<p class="price-variable">Max price varies — quote based on parts availability.</p>' : '';
-
-  return `
-    <div class="price-card">
-      <div class="card-brand">${entry.brand}</div>
-      <div class="card-model">${entry.model}</div>
-      <span class="card-type ${typeClass(entry.repairType)}">${entry.repairType}</span>
-      <div class="card-prices">${pillsHTML}</div>
-      ${variableNote}
-    </div>`;
+  let pills = '';
+  if (isLCD && npStr) pills += `<div class="price-pill pill-np"><div class="price-pill-label">Non-Profit</div><div class="price-pill-value">${npStr}</div></div>`;
+  if (minStr)          pills += `<div class="price-pill pill-min"><div class="price-pill-label">Minimum</div><div class="price-pill-value">${minStr}</div></div>`;
+  if (maxStr)          pills += `<div class="price-pill pill-max"><div class="price-pill-label">Maximum</div><div class="price-pill-value">${maxStr}</div></div>`;
+  const note = (!maxStr && minStr) ? '<p class="price-variable">Max price varies — quote based on parts availability.</p>' : '';
+  return `<div class="price-card">
+    <div class="card-brand">${entry.brand}</div>
+    <div class="card-model">${entry.model}</div>
+    <span class="card-type ${typeClass(entry.repairType)}">${entry.repairType}</span>
+    <div class="card-prices">${pills}</div>${note}
+  </div>`;
 }
 
 // -----------------------------------------------
 // ADMIN FORM
 // -----------------------------------------------
 function handleRepairTypeChange() {
-  const type   = document.getElementById('fRepairType').value;
+  const type = document.getElementById('fRepairType').value;
   const npGroup = document.getElementById('npGroup');
-  const npInput = document.getElementById('fNonProfit');
-  if (type === 'LCD') {
-    npGroup.style.display = '';
-  } else {
-    npGroup.style.display = 'none';
-    npInput.value = '';
-  }
+  document.getElementById('fNonProfit').value = '';
+  npGroup.style.display = type === 'LCD' ? '' : 'none';
 }
-
 function populateBrandSelect() {
   const sel = document.getElementById('fBrand');
-  // Remove existing custom options (keep first 6: placeholder + 5 defaults)
   while (sel.options.length > 6) sel.remove(6);
   customCategories.forEach(cat => {
     const opt = document.createElement('option');
@@ -574,10 +585,7 @@ function populateBrandSelect() {
     sel.appendChild(opt);
   });
 }
-
-function genId() {
-  return 'u' + Date.now() + Math.random().toString(36).slice(2,6);
-}
+function genId() { return 'u' + Date.now() + Math.random().toString(36).slice(2,6); }
 
 function saveEntry() {
   const brand      = document.getElementById('fBrand').value.trim();
@@ -588,28 +596,21 @@ function saveEntry() {
   const maximum    = document.getElementById('fMax').value;
   const kwRaw      = document.getElementById('fKeywords').value;
   const errEl      = document.getElementById('formError');
-
   errEl.textContent = '';
   if (!brand || !model || !repairType) { errEl.textContent = 'Brand, Model, and Repair Type are required.'; return; }
   if (!minimum) { errEl.textContent = 'Minimum Price is required.'; return; }
-
   const keywords = kwRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
   const entry = {
-    id: editingId || genId(),
-    brand, model, repairType,
+    id: editingId || genId(), brand, model, repairType,
     nonProfit: repairType === 'LCD' && nonProfit ? parseFloat(nonProfit) : null,
     minimum: parseFloat(minimum),
     maximum: maximum ? parseFloat(maximum) : null,
     keywords,
   };
-
   if (editingId) {
     const idx = repairs.findIndex(r => r.id === editingId);
     if (idx !== -1) repairs[idx] = entry;
-  } else {
-    repairs.push(entry);
-  }
-
+  } else { repairs.push(entry); }
   saveData(repairs);
   resetForm();
   renderAdminList();
@@ -617,11 +618,8 @@ function saveEntry() {
   toast(editingId ? '✅ Repair updated!' : '✅ New repair added!');
   editingId = null;
 }
-
 function resetForm() {
-  ['fBrand','fModel','fRepairType','fNonProfit','fMin','fMax','fKeywords'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  ['fBrand','fModel','fRepairType','fNonProfit','fMin','fMax','fKeywords'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('npGroup').style.display = 'none';
   document.getElementById('formTitle').textContent = '➕ Add New Repair';
   document.getElementById('cancelEditBtn').style.display = 'none';
@@ -629,7 +627,6 @@ function resetForm() {
   editingId = null;
 }
 function cancelEdit() { resetForm(); }
-
 function editEntry(id) {
   const entry = repairs.find(r => r.id === id);
   if (!entry) return;
@@ -640,13 +637,12 @@ function editEntry(id) {
   document.getElementById('fNonProfit').value  = entry.nonProfit || '';
   document.getElementById('fMin').value        = entry.minimum || '';
   document.getElementById('fMax').value        = entry.maximum || '';
-  document.getElementById('fKeywords').value   = (entry.keywords || []).join(', ');
+  document.getElementById('fKeywords').value   = (entry.keywords||[]).join(', ');
   handleRepairTypeChange();
   document.getElementById('formTitle').textContent = '✏️ Edit Repair';
   document.getElementById('cancelEditBtn').style.display = '';
   document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
 }
-
 function deleteEntry(id) {
   const entry = repairs.find(r => r.id === id);
   if (!entry) return;
@@ -665,37 +661,31 @@ function renderAdminList() {
   const q = normalize(document.getElementById('adminSearch').value);
   const list = document.getElementById('adminList');
   const filtered = q
-    ? repairs.filter(r => normalize(r.brand + ' ' + r.model + ' ' + r.repairType).includes(q))
+    ? repairs.filter(r => normalize(r.brand+' '+r.model+' '+r.repairType).includes(q))
     : repairs;
-
   if (filtered.length === 0) {
     list.innerHTML = '<p style="color:var(--gray-500);font-size:14px;padding:20px 0;">No entries match.</p>';
     return;
   }
-
   list.innerHTML = filtered.map(entry => {
-    const npStr  = entry.repairType === 'LCD' && entry.nonProfit ? `<span class="admin-price-tag tag-np">NP $${entry.nonProfit}</span>` : '';
+    const npStr  = entry.repairType==='LCD' && entry.nonProfit ? `<span class="admin-price-tag tag-np">NP $${entry.nonProfit}</span>` : '';
     const minStr = entry.minimum ? `<span class="admin-price-tag tag-min">Min $${entry.minimum}</span>` : '';
     const maxStr = entry.maximum ? `<span class="admin-price-tag tag-max">Max $${entry.maximum}</span>` : '';
-    return `
-      <div class="admin-row">
-        <div class="admin-row-info">
-          <div class="admin-row-brand">${entry.brand}</div>
-          <div class="admin-row-model">${entry.model}</div>
-          <div class="admin-row-meta">${entry.repairType}</div>
-        </div>
-        <div class="admin-row-prices">${npStr}${minStr}${maxStr}</div>
-        <div class="admin-row-btns">
-          <button class="btn-edit"   onclick="editEntry('${entry.id}')">✏️ Edit</button>
-          <button class="btn-delete" onclick="deleteEntry('${entry.id}')">🗑️ Delete</button>
-        </div>
-      </div>`;
+    return `<div class="admin-row">
+      <div class="admin-row-info">
+        <div class="admin-row-brand">${entry.brand}</div>
+        <div class="admin-row-model">${entry.model}</div>
+        <div class="admin-row-meta">${entry.repairType}</div>
+      </div>
+      <div class="admin-row-prices">${npStr}${minStr}${maxStr}</div>
+      <div class="admin-row-btns">
+        <button class="btn-edit"   onclick="editEntry('${entry.id}')">✏️ Edit</button>
+        <button class="btn-delete" onclick="deleteEntry('${entry.id}')">🗑️ Delete</button>
+      </div>
+    </div>`;
   }).join('');
 }
-
-function updateAdminCount() {
-  document.getElementById('adminCount').textContent = repairs.length;
-}
+function updateAdminCount() { document.getElementById('adminCount').textContent = repairs.length; }
 
 // -----------------------------------------------
 // ADD CATEGORY MODAL
@@ -703,22 +693,17 @@ function updateAdminCount() {
 function openAddCategoryModal() {
   document.getElementById('catName').value = '';
   document.getElementById('catError').textContent = '';
-  // Reset to global scope
   document.querySelector('input[name="catScope"][value="global"]').checked = true;
   updateCatScopeHint();
   document.getElementById('catModal').classList.add('open');
   setTimeout(() => document.getElementById('catName').focus(), 100);
 }
-function closeCatModal() {
-  document.getElementById('catModal').classList.remove('open');
-}
-function closeCatModalOutside(e) {
-  if (e.target === document.getElementById('catModal')) closeCatModal();
-}
+function closeCatModal() { document.getElementById('catModal').classList.remove('open'); }
+function closeCatModalOutside(e) { if (e.target===document.getElementById('catModal')) closeCatModal(); }
 function updateCatScopeHint() {
   const scope = document.querySelector('input[name="catScope"]:checked').value;
-  const hint = document.getElementById('catScopeHint');
-  if (scope === 'ipad') {
+  const hint  = document.getElementById('catScopeHint');
+  if (scope==='ipad') {
     hint.textContent = 'Appears as a sub-filter under iPad (e.g. Battery, Camera, Face ID, Speaker).';
     document.getElementById('catName').placeholder = 'e.g. Battery, Camera, Face ID, Speaker…';
   } else {
@@ -726,37 +711,29 @@ function updateCatScopeHint() {
     document.getElementById('catName').placeholder = 'e.g. iWatch, MacBook, Google Pixel Parts…';
   }
 }
-// Allow Enter key in modal
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('catName').addEventListener('keydown', e => {
-    if (e.key === 'Enter') saveCategory();
-    if (e.key === 'Escape') closeCatModal();
+    if (e.key==='Enter') saveCategory();
+    if (e.key==='Escape') closeCatModal();
   });
 });
-
 function saveCategory() {
   const name  = document.getElementById('catName').value.trim();
   const scope = document.querySelector('input[name="catScope"]:checked').value;
   const errEl = document.getElementById('catError');
   errEl.textContent = '';
-
   if (!name) { errEl.textContent = 'Please enter a category name.'; return; }
-
-  if (scope === 'ipad') {
-    const existing = ['all','LCD','Digitizer', ...ipadCustomCategories];
-    if (existing.map(c => c.toLowerCase()).includes(name.toLowerCase())) {
-      errEl.textContent = 'That iPad category already exists.'; return;
-    }
+  if (scope==='ipad') {
+    const existing = ['all','LCD','Digitizer',...ipadCustomCategories];
+    if (existing.map(c=>c.toLowerCase()).includes(name.toLowerCase())) { errEl.textContent='That iPad category already exists.'; return; }
     ipadCustomCategories.push(name);
     saveIpadCustomCategories(ipadCustomCategories);
     renderDynamicIpadFilters();
     closeCatModal();
     toast(`✅ iPad category "${name}" added!`);
   } else {
-    const allExisting = ['all','iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera','Other', ...customCategories];
-    if (allExisting.map(c => c.toLowerCase()).includes(name.toLowerCase())) {
-      errEl.textContent = 'That category already exists.'; return;
-    }
+    const allExisting = ['all','iPhone','Samsung','Motorola','Google Pixel','iPad','Battery','Charging Port','Camera','Other',...customCategories];
+    if (allExisting.map(c=>c.toLowerCase()).includes(name.toLowerCase())) { errEl.textContent='That category already exists.'; return; }
     customCategories.push(name);
     saveCustomCategories(customCategories);
     renderDynamicFilters();
@@ -771,8 +748,7 @@ function saveCategory() {
 // -----------------------------------------------
 function exportData() {
   const payload = { repairs, customCategories, ipadCustomCategories };
-  const json = JSON.stringify(payload, null, 2);
-  const blob = new Blob([json], { type:'application/json' });
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url;
@@ -781,40 +757,22 @@ function exportData() {
   URL.revokeObjectURL(url);
   toast('📥 Backup downloaded!');
 }
-
 function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const parsed = JSON.parse(e.target.result);
-      let newRepairs, newCats, newIpadCats;
-      if (Array.isArray(parsed)) {
-        newRepairs = parsed; newCats = []; newIpadCats = [];
-      } else if (parsed.repairs && Array.isArray(parsed.repairs)) {
-        newRepairs   = parsed.repairs;
-        newCats      = parsed.customCategories || [];
-        newIpadCats  = parsed.ipadCustomCategories || [];
-      } else {
-        throw new Error('Invalid format');
-      }
-      if (!confirm(`Import ${newRepairs.length} repair entries?\n\nThis will REPLACE your current data.`)) return;
-      repairs = newRepairs;
-      customCategories = newCats;
-      ipadCustomCategories = newIpadCats;
-      saveData(repairs);
-      saveCustomCategories(customCategories);
-      saveIpadCustomCategories(ipadCustomCategories);
-      renderAdminList();
-      updateAdminCount();
-      renderDynamicFilters();
-      renderDynamicIpadFilters();
-      populateBrandSelect();
-      toast(`✅ Imported ${newRepairs.length} entries!`);
-    } catch(err) {
-      alert('Import failed — invalid file. Please use a backup exported from this tool.');
-    }
+      let nr, nc, ni;
+      if (Array.isArray(parsed)) { nr=parsed; nc=[]; ni=[]; }
+      else if (parsed.repairs && Array.isArray(parsed.repairs)) { nr=parsed.repairs; nc=parsed.customCategories||[]; ni=parsed.ipadCustomCategories||[]; }
+      else throw new Error();
+      if (!confirm(`Import ${nr.length} repair entries?\n\nThis will REPLACE your current data.`)) return;
+      repairs=nr; customCategories=nc; ipadCustomCategories=ni;
+      saveData(repairs); saveCustomCategories(customCategories); saveIpadCustomCategories(ipadCustomCategories);
+      renderAdminList(); updateAdminCount(); renderDynamicFilters(); renderDynamicIpadFilters(); populateBrandSelect();
+      toast(`✅ Imported ${nr.length} entries!`);
+    } catch { alert('Import failed — invalid file.'); }
     event.target.value = '';
   };
   reader.readAsText(file);
@@ -825,8 +783,421 @@ function importData(event) {
 // -----------------------------------------------
 function toast(msg) {
   const el = document.createElement('div');
-  el.className = 'toast';
-  el.textContent = msg;
+  el.className = 'toast'; el.textContent = msg;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 3000);
+}
+
+// ===============================================
+// RON — AI ORB ASSISTANT
+// ===============================================
+
+// --- Idle speech bubbles ---
+const RON_IDLE_BUBBLES = [
+  'Need my help?',
+  'I know every repair price.',
+  'Still searching manually?',
+  'Click me.',
+  'I\'ll make this faster.',
+  'RON is online.',
+  'Hey... over here.',
+  'Ask me anything.',
+  'I can find any price.',
+  'I\'m still here...',
+];
+
+// --- Personality responses ---
+const RON_GREETINGS = [
+  'Hey! What repair are we looking up?',
+  'Got it. What model?',
+  'RON online. What do you need?',
+  'I\'m here. What\'s the repair?',
+];
+
+// --- RON state ---
+let ronOpen         = false;
+let ronIdleTimer    = null;
+let ronAnnoyTimer   = null;
+let ronBubbleTimer  = null;
+let ronMood         = 'normal'; // normal | thinking | happy | confused | annoyed | sleeping
+let ronAddFlow      = null;     // { stage, brand, model, repairType, nonProfit }
+let ronLastActivity = Date.now();
+
+// --- RON orb mood ---
+function ronSetMood(mood, duration = 2000) {
+  const orb = document.getElementById('ronOrb');
+  if (!orb) return;
+  orb.classList.remove('mood-thinking','mood-happy','mood-confused','mood-annoyed','mood-sleeping');
+  if (mood !== 'normal') {
+    orb.classList.add('mood-' + mood);
+    if (duration > 0) setTimeout(() => {
+      orb.classList.remove('mood-' + mood);
+      ronMood = 'normal';
+    }, duration);
+  }
+  ronMood = mood;
+}
+
+// --- Speech bubble beside orb ---
+function ronShowBubble(text, durationMs = 3500) {
+  const bubble = document.getElementById('ronBubble');
+  if (!bubble || ronOpen) return;
+  bubble.textContent = text;
+  bubble.style.display = 'block';
+  clearTimeout(ronBubbleTimer);
+  ronBubbleTimer = setTimeout(() => { bubble.style.display = 'none'; }, durationMs);
+}
+
+// --- Idle timer: show bubbles after inactivity ---
+function ronResetIdleTimer() {
+  ronLastActivity = Date.now();
+  clearTimeout(ronIdleTimer);
+  clearTimeout(ronAnnoyTimer);
+  if (!ronOpen) {
+    ronIdleTimer = setTimeout(() => {
+      const msg = RON_IDLE_BUBBLES[Math.floor(Math.random() * RON_IDLE_BUBBLES.length)];
+      ronShowBubble(msg, 4000);
+      ronSetMood('normal', 0);
+      // Annoy phase after further wait
+      ronAnnoyTimer = setTimeout(() => {
+        if (!ronOpen) {
+          ronSetMood('annoyed', 2000);
+          const annoyMsgs = ["I'm still here...", "You know I can do that faster.", "Manual searching again?"];
+          ronShowBubble(annoyMsgs[Math.floor(Math.random()*annoyMsgs.length)], 4000);
+        }
+      }, 30000);
+    }, 20000);
+  }
+}
+
+// --- Toggle open/close ---
+function ronToggle() {
+  ronOpen = !ronOpen;
+  const panel  = document.getElementById('ronPanel');
+  const bubble = document.getElementById('ronBubble');
+  bubble.style.display = 'none';
+  clearTimeout(ronBubbleTimer);
+
+  if (ronOpen) {
+    panel.style.display = 'flex';
+    ronSetMood('normal', 0);
+    clearTimeout(ronIdleTimer);
+    clearTimeout(ronAnnoyTimer);
+    if (document.getElementById('ronMessages').children.length === 0) {
+      ronAppend('ron', RON_GREETINGS[Math.floor(Math.random() * RON_GREETINGS.length)]);
+    }
+    setTimeout(() => document.getElementById('ronInput').focus(), 100);
+  } else {
+    panel.style.display = 'none';
+    ronAddFlow = null;
+    ronResetIdleTimer();
+  }
+}
+
+// --- Append message to chat ---
+function ronAppend(who, content, isHtml = false) {
+  const box = document.getElementById('ronMessages');
+  const wrap = document.createElement('div');
+  wrap.className = 'ron-msg ' + who;
+
+  if (who === 'ron') {
+    wrap.innerHTML = `
+      <div class="ron-msg-avatar">
+        <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="aOrbBg${Date.now()}" cx="38%" cy="32%" r="70%">
+              <stop offset="0%" stop-color="#b0ffd4"/>
+              <stop offset="35%" stop-color="#00e864"/>
+              <stop offset="100%" stop-color="#02230f"/>
+            </radialGradient>
+          </defs>
+          <circle cx="18" cy="18" r="16" fill="url(#aOrbBg${Date.now()})" stroke="#0e4a26" stroke-width="1"/>
+          <ellipse cx="13" cy="11" rx="5" ry="3" fill="white" opacity="0.2"/>
+        </svg>
+      </div>`;
+    const bubble = document.createElement('div');
+    bubble.className = 'ron-msg-bubble';
+    if (isHtml) bubble.innerHTML = content;
+    else bubble.textContent = content;
+    wrap.appendChild(bubble);
+  } else {
+    const bubble = document.createElement('div');
+    bubble.className = 'ron-msg-bubble';
+    bubble.textContent = content;
+    wrap.appendChild(bubble);
+  }
+
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
+}
+
+// --- Thinking animation ---
+function ronThinkingStart() {
+  ronSetMood('thinking', 0);
+  document.getElementById('ronStatus').textContent = '● Searching...';
+  const box  = document.getElementById('ronMessages');
+  const dots = document.createElement('div');
+  dots.className = 'ron-msg ron';
+  dots.id = 'ronThinkDots';
+  dots.innerHTML = `<div class="ron-msg-avatar"><svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="18" cy="18" r="16" fill="#0a3d22" stroke="#0e4a26" stroke-width="1"/>
+    </svg></div>
+    <div class="ron-msg-bubble"><div class="ron-thinking"><span></span><span></span><span></span></div></div>`;
+  box.appendChild(dots);
+  box.scrollTop = box.scrollHeight;
+}
+function ronThinkingStop() {
+  document.getElementById('ronStatus').textContent = '● Online';
+  const d = document.getElementById('ronThinkDots');
+  if (d) d.remove();
+}
+
+// --- Build RON price card HTML ---
+function ronBuildCard(entry) {
+  const isLCD = entry.repairType === 'LCD';
+  const npStr  = fmt(entry.nonProfit);
+  const minStr = fmt(entry.minimum);
+  const maxStr = fmt(entry.maximum);
+  let pills = '';
+  if (isLCD && npStr) pills += `<div class="ron-card-pill p-np"><div class="ron-card-pill-label">Non-Profit</div><div class="ron-card-pill-value">${npStr}</div></div>`;
+  if (minStr)          pills += `<div class="ron-card-pill p-min"><div class="ron-card-pill-label">Minimum</div><div class="ron-card-pill-value">${minStr}</div></div>`;
+  if (maxStr)          pills += `<div class="ron-card-pill p-max"><div class="ron-card-pill-label">Maximum</div><div class="ron-card-pill-value">${maxStr}</div></div>`;
+  return `<div class="ron-price-card">
+    <div class="ron-card-brand">${entry.brand}</div>
+    <div class="ron-card-model">${entry.model}</div>
+    <span class="ron-card-type">${entry.repairType}</span>
+    <div class="ron-card-prices">${pills}</div>
+  </div>`;
+}
+
+// --- RON search prices ---
+function ronSearchRepairs(rawQuery) {
+  const q = normalize(expandAliases(rawQuery));
+  const queryModelNum = extractModelNumber(q);
+  return repairs
+    .map(entry => ({ entry, score: matchScore(entry, rawQuery) }))
+    .filter(r => r.score > 0)
+    .sort((a,b) => b.score - a.score)
+    .map(r => r.entry);
+}
+
+// --- Parse "add X" intent ---
+function ronParseAdd(input) {
+  const lower = input.toLowerCase().replace(/^add\s*/,'').trim();
+  // Try to detect repairType
+  let repairType = null;
+  if (/\blcd\b|screen|display/.test(lower)) repairType = 'LCD';
+  else if (/battery/.test(lower)) repairType = 'Battery';
+  else if (/charg|port/.test(lower)) repairType = 'Charging Port';
+  else if (/camera|cam/.test(lower)) repairType = 'Camera';
+  else if (/digi/.test(lower)) repairType = 'Digitizer';
+
+  // Strip repair type words to get model name
+  let modelRaw = lower
+    .replace(/\blcd\b|screen|display|battery|charging port|charger port|charge port|camera|cam|digitizer|digi/g,'')
+    .replace(/\s+/g,' ').trim();
+
+  // Detect brand
+  let brand = null;
+  if (/\biphone\b|\bip\b/.test(modelRaw)) brand = 'iPhone';
+  else if (/\bsamsung\b|\bgalaxy\b/.test(modelRaw)) brand = 'Samsung';
+  else if (/\bpixel\b/.test(modelRaw)) brand = 'Google Pixel';
+  else if (/\bmoto\b|\bmotorola\b/.test(modelRaw)) brand = 'Motorola';
+  else if (/\bipad\b/.test(modelRaw)) brand = 'iPad';
+
+  // Capitalize model
+  const model = modelRaw.replace(/\b\w/g, c => c.toUpperCase()).trim();
+  return { brand, model, repairType };
+}
+
+// --- Main RON process message ---
+function ronProcess(input) {
+  const raw   = input.trim();
+  const lower = raw.toLowerCase();
+
+  ronLastActivity = Date.now();
+
+  // ---- ADD FLOW ----
+  if (ronAddFlow) {
+    const stage = ronAddFlow.stage;
+
+    if (stage === 'confirm') {
+      if (/yes|yeah|yep|save|confirm|ok|sure/.test(lower)) {
+        // Save to repairs
+        const entry = {
+          id: genId(),
+          brand:      ronAddFlow.brand,
+          model:      ronAddFlow.model,
+          repairType: ronAddFlow.repairType,
+          nonProfit:  ronAddFlow.repairType === 'LCD' && ronAddFlow.nonProfit ? parseFloat(ronAddFlow.nonProfit) : null,
+          minimum:    parseFloat(ronAddFlow.minimum),
+          maximum:    ronAddFlow.maximum ? parseFloat(ronAddFlow.maximum) : null,
+          keywords:   [ronAddFlow.model.toLowerCase(), ronAddFlow.brand.toLowerCase() + ' ' + ronAddFlow.model.toLowerCase()],
+        };
+        repairs.push(entry);
+        saveData(repairs);
+        renderAdminList();
+        updateAdminCount();
+        ronAddFlow = null;
+        ronSetMood('happy', 1500);
+        ronThinkingStop();
+        ronAppend('ron', `Saved. ${entry.model} — ${entry.repairType} is now in the system. You can find it in search too.`);
+        return;
+      } else if (/no|nope|cancel|stop/.test(lower)) {
+        ronAddFlow = null;
+        ronAppend('ron', 'Got it. Cancelled.');
+        return;
+      } else {
+        ronAppend('ron', 'Just say yes to save or no to cancel.');
+        return;
+      }
+    }
+
+    if (stage === 'np') {
+      if (isNaN(parseFloat(raw))) { ronAppend('ron', 'Give me a number — like 140'); return; }
+      ronAddFlow.nonProfit = raw;
+      ronAddFlow.stage = 'min';
+      ronAppend('ron', 'Got it. Minimum price?');
+      return;
+    }
+    if (stage === 'min') {
+      if (isNaN(parseFloat(raw))) { ronAppend('ron', 'Number only — like 180'); return; }
+      ronAddFlow.minimum = raw;
+      ronAddFlow.stage = 'max';
+      ronAppend('ron', 'Maximum price?');
+      return;
+    }
+    if (stage === 'max') {
+      if (isNaN(parseFloat(raw)) && !/skip|none|var/i.test(raw)) { ronAppend('ron', 'Number, or say "skip" if it varies.'); return; }
+      ronAddFlow.maximum = /skip|none|var/i.test(raw) ? null : raw;
+      ronAddFlow.stage = 'confirm';
+      const npLine = ronAddFlow.repairType === 'LCD' && ronAddFlow.nonProfit ? `\nNon-Profit: $${ronAddFlow.nonProfit}` : '';
+      const maxLine = ronAddFlow.maximum ? `\nMaximum: $${ronAddFlow.maximum}` : '\nMaximum: varies';
+      ronAppend('ron', `Here's what I have:\n\nBrand: ${ronAddFlow.brand || 'Unknown'}\nModel: ${ronAddFlow.model}\nType: ${ronAddFlow.repairType}${npLine}\nMinimum: $${ronAddFlow.minimum}${maxLine}\n\nSave this?`);
+      return;
+    }
+    if (stage === 'brand') {
+      ronAddFlow.brand = raw.trim();
+      ronAddFlow.stage = ronAddFlow.repairType === 'LCD' ? 'np' : 'min';
+      if (ronAddFlow.repairType === 'LCD') ronAppend('ron', `Got it. Non-profit price for ${ronAddFlow.model}?`);
+      else ronAppend('ron', `Got it. Minimum price for ${ronAddFlow.model}?`);
+      return;
+    }
+    if (stage === 'repairType') {
+      let rt = null;
+      if (/lcd|screen|display/.test(lower)) rt = 'LCD';
+      else if (/battery/.test(lower)) rt = 'Battery';
+      else if (/charg|port/.test(lower)) rt = 'Charging Port';
+      else if (/camera|cam/.test(lower)) rt = 'Camera';
+      else if (/digi/.test(lower)) rt = 'Digitizer';
+      if (!rt) { ronAppend('ron', 'What type? LCD, Battery, Charging Port, Camera, or Digitizer?'); return; }
+      ronAddFlow.repairType = rt;
+      ronAddFlow.stage = ronAddFlow.repairType === 'LCD' ? 'np' : 'min';
+      if (ronAddFlow.repairType === 'LCD') ronAppend('ron', `Non-profit price?`);
+      else ronAppend('ron', `Minimum price?`);
+      return;
+    }
+  }
+
+  // ---- ADD INTENT ----
+  if (/^add\s+.+/.test(lower)) {
+    const parsed = ronParseAdd(raw);
+    ronAddFlow = { stage: null, ...parsed };
+    if (!parsed.model || parsed.model.length < 2) {
+      ronAddFlow = null;
+      ronAppend('ron', 'What model do you want to add? Like: add iPhone 18 LCD');
+      return;
+    }
+    if (!parsed.brand) {
+      ronAddFlow.stage = 'brand';
+      ronAppend('ron', `What brand is "${parsed.model}"? iPhone, Samsung, Google Pixel, Motorola, iPad?`);
+      return;
+    }
+    if (!parsed.repairType) {
+      ronAddFlow.stage = 'repairType';
+      ronAppend('ron', `What repair type for ${parsed.model}? LCD, Battery, Charging Port, Camera, or Digitizer?`);
+      return;
+    }
+    ronAddFlow.stage = parsed.repairType === 'LCD' ? 'np' : 'min';
+    if (parsed.repairType === 'LCD') ronAppend('ron', `Got it — ${parsed.brand} ${parsed.model} LCD. Non-profit price?`);
+    else ronAppend('ron', `Got it — ${parsed.brand} ${parsed.model} ${parsed.repairType}. Minimum price?`);
+    return;
+  }
+
+  // ---- GREETING ----
+  if (/^(hi|hey|hello|yo|sup|what'?s up|wassup)/.test(lower)) {
+    ronAppend('ron', RON_GREETINGS[Math.floor(Math.random() * RON_GREETINGS.length)]);
+    return;
+  }
+
+  // ---- PRICE SEARCH ----
+  ronThinkingStart();
+  ronSetMood('thinking', 0);
+
+  setTimeout(() => {
+    ronThinkingStop();
+    const results = ronSearchRepairs(raw);
+
+    if (results.length === 0) {
+      ronSetMood('confused', 2000);
+      ronAppend('ron', 'Call your manager for price info please. I don\'t have that data yet.');
+      return;
+    }
+
+    if (results.length === 1) {
+      ronSetMood('happy', 1500);
+      ronAppend('ron', 'Found it.', false);
+      ronAppend('ron', ronBuildCard(results[0]), true);
+      return;
+    }
+
+    if (results.length <= 5) {
+      ronSetMood('happy', 1500);
+      ronAppend('ron', `Found ${results.length} matches:`, false);
+      results.forEach(r => ronAppend('ron', ronBuildCard(r), true));
+      return;
+    }
+
+    // Many results — ask to narrow
+    ronSetMood('confused', 1500);
+    const preview = results.slice(0, 4);
+    let chipsHtml = '<div class="ron-chips">';
+    preview.forEach(r => {
+      const label = r.model + ' ' + r.repairType;
+      chipsHtml += `<button class="ron-chip" onclick="ronChipClick('${label.replace(/'/g,"\\'")}') ">${label}</button>`;
+    });
+    chipsHtml += '</div>';
+    ronAppend('ron', `I found ${results.length} results. Which one did you mean?`, false);
+    ronAppend('ron', chipsHtml, true);
+  }, 650);
+}
+
+function ronChipClick(label) {
+  document.getElementById('ronInput').value = label;
+  ronAppend('user', label);
+  ronProcess(label);
+}
+
+// --- Send ---
+function ronSend() {
+  const inp = document.getElementById('ronInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  ronAppend('user', val);
+  inp.value = '';
+  ronProcess(val);
+}
+
+// --- Enter key in RON input ---
+function ronInit() {
+  const inp = document.getElementById('ronInput');
+  if (inp) {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') ronSend();
+    });
+  }
+  ronResetIdleTimer();
+  // Reset idle on any page interaction
+  document.addEventListener('click', () => ronResetIdleTimer());
+  document.addEventListener('keydown', () => ronResetIdleTimer());
 }
