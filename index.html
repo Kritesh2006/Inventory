@@ -10,6 +10,34 @@
 </head>
 <body>
 
+  <!-- ===== BOOT LOADER ===== -->
+  <div id="bootLoader">
+    <div class="boot-inner">
+      <div class="boot-orb">
+        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="bg1" cx="38%" cy="35%" r="65%">
+              <stop offset="0%" stop-color="#a8ffcc"/>
+              <stop offset="40%" stop-color="#1aff6e"/>
+              <stop offset="100%" stop-color="#064d28"/>
+            </radialGradient>
+            <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#00ff88" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#003a18" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="40" cy="40" r="36" fill="url(#glow1)" opacity="0.6"/>
+          <circle cx="40" cy="40" r="30" fill="url(#bg1)" stroke="#0f5c2e" stroke-width="1.5"/>
+          <ellipse cx="32" cy="26" rx="9" ry="5" fill="white" opacity="0.18"/>
+        </svg>
+      </div>
+      <div class="boot-brand">REPAIR 1.0 / V1</div>
+      <div class="boot-msg" id="bootMsg">Initializing...</div>
+      <div class="boot-bar"><div class="boot-bar-fill" id="bootBarFill"></div></div>
+      <div class="boot-sub">Internal Staff System · Greensboro</div>
+    </div>
+  </div>
+
   <!-- HEADER -->
   <header class="site-header">
     <div class="header-inner">
@@ -29,7 +57,6 @@
 
   <!-- ===== LOOKUP VIEW ===== -->
   <div id="viewLookup">
-
     <section class="search-section">
       <div class="search-inner">
         <h1 class="search-heading">Find a Repair Price</h1>
@@ -52,13 +79,11 @@
           <button class="filter-btn" data-cat="Charging Port">Charging Port</button>
           <button class="filter-btn" data-cat="Camera">Camera</button>
           <button class="filter-btn" data-cat="Other">Other Repairs</button>
-          <!-- Dynamic category filters injected here by JS -->
           <span id="dynamicFilters"></span>
         </div>
       </div>
     </section>
 
-    <!-- iPad sub-filters: LCD / Digitizer / custom iPad parts — shown only when iPad filter active -->
     <div class="ipad-subfilters" id="ipadSubfilters" style="display:none">
       <div class="ipad-subfilter-inner">
         <span class="ipad-sub-label">iPad ›</span>
@@ -89,13 +114,11 @@
         <p>Try a different spelling or shorthand — e.g. <em>13 PM, S23, Moto Stylus, Pixel 7</em></p>
       </div>
     </main>
-
   </div>
 
   <!-- ===== ADMIN VIEW ===== -->
   <div id="viewAdmin" style="display:none">
     <div class="admin-wrap">
-
       <div class="admin-header">
         <div>
           <h2 class="admin-title">⚙️ Manage Repair Prices</h2>
@@ -111,7 +134,6 @@
         </div>
       </div>
 
-      <!-- ADD / EDIT FORM -->
       <div class="form-card" id="formCard">
         <h3 class="form-title" id="formTitle">➕ Add New Repair</h3>
         <div class="form-grid">
@@ -168,12 +190,10 @@
         <p class="form-error" id="formError"></p>
       </div>
 
-      <!-- ADMIN LIST -->
       <div class="admin-list-header">
         <h3 class="form-title" style="margin:0">📋 All Repairs (<span id="adminCount">0</span>)</h3>
         <input type="text" id="adminSearch" class="admin-search-input" placeholder="Filter list…" oninput="renderAdminList()" />
       </div>
-
       <div id="adminList" class="admin-list"></div>
     </div>
   </div>
@@ -183,7 +203,6 @@
     <div class="modal-box">
       <div class="modal-title">➕ Add New Category</div>
       <div class="modal-sub">Choose where to add this category.</div>
-
       <div class="modal-scope-row">
         <label class="modal-scope-opt">
           <input type="radio" name="catScope" value="global" checked onchange="updateCatScopeHint()" />
@@ -195,13 +214,86 @@
         </label>
       </div>
       <p class="modal-scope-hint" id="catScopeHint">Appears as a top-level filter and Brand option (e.g. iWatch, MacBook).</p>
-
       <input type="text" class="modal-input" id="catName" placeholder="e.g. iWatch, MacBook, Face ID, Speaker…" />
       <p class="modal-error" id="catError"></p>
       <div class="modal-actions">
         <button class="modal-cancel" onclick="closeCatModal()">Cancel</button>
         <button class="modal-confirm" onclick="saveCategory()">Add Category</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== RON ORB ===== -->
+  <div id="ronOrb" onclick="ronToggle()" title="Ask RON">
+    <svg id="ronOrbSvg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="orbBg" cx="38%" cy="32%" r="70%">
+          <stop offset="0%"   stop-color="#b0ffd4"/>
+          <stop offset="30%"  stop-color="#00e864"/>
+          <stop offset="65%"  stop-color="#0a6b35"/>
+          <stop offset="100%" stop-color="#02230f"/>
+        </radialGradient>
+        <radialGradient id="orbGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stop-color="#00ff88" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#003318" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="orbRed" cx="70%" cy="72%" r="42%">
+          <stop offset="0%"   stop-color="#ff3a3a" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#7a0000" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="orbBlur">
+          <feGaussianBlur stdDeviation="3.5"/>
+        </filter>
+      </defs>
+      <!-- outer glow -->
+      <circle cx="40" cy="40" r="38" fill="url(#orbGlow)" filter="url(#orbBlur)"/>
+      <!-- red energy accent -->
+      <circle cx="40" cy="40" r="30" fill="url(#orbRed)"/>
+      <!-- main sphere -->
+      <circle cx="40" cy="40" r="30" fill="url(#orbBg)" stroke="#0e4a26" stroke-width="1.2"/>
+      <!-- lightning lines -->
+      <g stroke="#a0ffc8" stroke-width="0.9" opacity="0.6" fill="none">
+        <path d="M40 14 L35 28 L42 28 L36 46"/>
+        <path d="M40 14 L46 30 L39 30 L44 46"/>
+        <path d="M28 22 L34 35 L30 35 L36 52"/>
+        <path d="M52 22 L46 35 L50 35 L44 52"/>
+        <path d="M22 40 L34 38 L30 44 L42 42"/>
+        <path d="M58 40 L46 42 L50 36 L38 38"/>
+      </g>
+      <!-- highlight -->
+      <ellipse cx="32" cy="24" rx="9" ry="5" fill="white" opacity="0.2"/>
+    </svg>
+    <div id="ronBubble" class="ron-bubble" style="display:none"></div>
+  </div>
+
+  <!-- RON CHAT PANEL -->
+  <div id="ronPanel" class="ron-panel" style="display:none">
+    <div class="ron-panel-header">
+      <div class="ron-header-left">
+        <div class="ron-header-orb">
+          <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="hOrbBg" cx="38%" cy="32%" r="70%">
+                <stop offset="0%"   stop-color="#b0ffd4"/>
+                <stop offset="35%"  stop-color="#00e864"/>
+                <stop offset="100%" stop-color="#02230f"/>
+              </radialGradient>
+            </defs>
+            <circle cx="18" cy="18" r="16" fill="url(#hOrbBg)" stroke="#0e4a26" stroke-width="1"/>
+            <ellipse cx="13" cy="11" rx="5" ry="3" fill="white" opacity="0.2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="ron-header-name">RON</div>
+          <div class="ron-header-status" id="ronStatus">● Online</div>
+        </div>
+      </div>
+      <button class="ron-close" onclick="ronToggle()">✕</button>
+    </div>
+    <div class="ron-messages" id="ronMessages"></div>
+    <div class="ron-input-row">
+      <input type="text" id="ronInput" class="ron-input" placeholder="Ask about any repair price…" autocomplete="off" />
+      <button class="ron-send" onclick="ronSend()">↑</button>
     </div>
   </div>
 
